@@ -1,0 +1,29 @@
+compatibility_flags = [ "nodejs_als" ]
+compatibility_date = "2024-09-23"
+
+main = "./.output/server/worker.mjs"
+
+# Globals variables
+workers_dev = false
+upload_source_maps = true
+assets = { directory = "./.output/public/", binding = "ASSETS" }
+
+[observability.logs]
+enabled = true
+
+# Defaults used if we build and run locally
+[vars]
+NUXT_PUBLIC_VERSION = '1.0.0'
+NUXT_PUBLIC_ENVIRONMENT = "prod"
+NUXT_PUBLIC_SENTRY = 'dsn'
+
+[env.dp-prod]
+version_metadata = { binding = "CF_VERSION_METADATA" }
+vars = { NUXT_PUBLIC_ENVIRONMENT = "prod", NUXT_PUBLIC_VERSION = '1.0.0', NUXT_PUBLIC_SENTRY = 'dsn' }
+name = "dp-prod"
+route = { pattern = "app.digitalprivacy.cloud", custom_domain = true, zone_name = "digitalprivacy.cloud" }
+
+[[env.dp-prod.kv_namespaces]]
+binding = "digitalprivacy"
+id = "344ac07f484d4371927c72b08caaeb2b"
+

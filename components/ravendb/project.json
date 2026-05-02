@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@nodevault/platform.components.ravendb",
+  "sourceRoot": "components/ravendb",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "components/ravendb/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

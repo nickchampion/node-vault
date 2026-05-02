@@ -1,0 +1,9 @@
+{
+  "name": "@nodevault/platform.libs.apis.core",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/apis/core",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project hectare-api --web",
+  "targets": {}
+}

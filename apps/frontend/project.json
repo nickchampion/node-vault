@@ -1,0 +1,198 @@
+{
+  "name": "@nodevault/platform.apps.trading",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/trading/app",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi build && cp ./../../.hectare/cloudflare/worker.mjs ./.output/server/worker.mjs"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "build-spa": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi generate --spa"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi dev"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "serve-spa": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi dev --spa"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-sync": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx cap sync"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-set-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx @capawesome/capver set",
+            "forwardAllArgs": true
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-run-ios": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx cap run ios"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-open-ios": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx cap open ios"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-run-android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx cap run android"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-open-android": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx cap open android"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-ota-upload": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx @capgo/cli bundle upload --tus --package-json=../../package.json --node-modules=../../node_modules",
+            "forwardAllArgs": true
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-ota-bundle-cleanup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bash -c \"yes || true\" | npx @capgo/cli bundle cleanup --keep=20",
+            "forwardAllArgs": true
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-deploy-ios-uat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bundle exec fastlane ios uat"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-deploy-ios-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bundle exec fastlane ios prod"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-deploy-android-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bundle exec fastlane android local"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-deploy-android-uat": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bundle exec fastlane android uat"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    },
+    "native-deploy-android-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "bundle exec fastlane android prod"
+          }
+        ],
+        "cwd": "apps/trading"
+      }
+    }
+  }
+}

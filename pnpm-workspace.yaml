@@ -1,0 +1,9 @@
+packages:
+  ["/apps/*"]
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - "@nodevault/platform.clients.common"
+  - "@nodevault/platform.clients.customers"
+  - "@nodevault/platform.clients.trading"
+  - "@nodevault/platform.clients.system"
+  - "@nodevault/platform.clients.logistics"
