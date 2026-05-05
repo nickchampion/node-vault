@@ -3,6 +3,27 @@
   // Hover to view descriptions of existing attributes.
   "version": "0.2.0",
   "configurations": [
+    {
+      "name": "Attach",
+      "type": "node",
+      "request": "attach",
+      "port": 9228,
+      "restart": true,
+      "timeout": 30000,
+      "skipFiles": [
+          // Node.js internal core modules
+          "<node_internals>/**",
+
+          // Ignore all dependencies (optional)
+          "${workspaceFolder}/node_modules/**",
+      ],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/modules/**",
+        "${workspaceFolder}/components/**",
+        "${workspaceFolder}/integrations/**",
+        "!**/node_modules/**"
+      ]
+    },
   ],
   "compounds": []
 }

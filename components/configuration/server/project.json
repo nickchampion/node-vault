@@ -1,0 +1,20 @@
+{
+  "name": "@nodevault/platform.components.configuration.server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "components/configuration/server",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "components/configuration/server/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

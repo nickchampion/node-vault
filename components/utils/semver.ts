@@ -7,16 +7,19 @@ export const incrementSemVer = (version: string, type: SemVerType) => {
 
   switch (type) {
     case 'major': {
-      return `${parseInt(parts[0]) + 1}.${parts[1]}.${parts[2]}`
+      return `${Number.parseInt(parts[0]) + 1}.${parts[1]}.${parts[2]}`
     }
+
     case 'minor': {
-      return `${parts[0]}.${parseInt(parts[1]) + 1}.${parts[2]}`
+      return `${parts[0]}.${Number.parseInt(parts[1]) + 1}.${parts[2]}`
     }
+
     case 'revision': {
       if (+parts[2] === 999) {
-        return `${parts[0]}.${parseInt(parts[1]) + 1}.0`
+        return `${parts[0]}.${Number.parseInt(parts[1]) + 1}.0`
       }
-      return `${parts[0]}.${parts[1]}.${parseInt(parts[2]) + 1}`
+
+      return `${parts[0]}.${parts[1]}.${Number.parseInt(parts[2]) + 1}`
     }
   }
 }

@@ -13,6 +13,7 @@ export type PriceRange = {
  */
 export const withinRange = (source: number, destination: number, percentage: number) => {
   const diff = (destination / 100) * percentage
+
   return source >= destination - diff && source <= destination + diff
 }
 
@@ -36,6 +37,7 @@ export const between = (target: number, min: number, max: number, inclusive = tr
  */
 export const withinRangeCeiling = (source: number, destination: number, percentage: number) => {
   const diff = (destination / 100) * percentage
+
   return source <= destination + diff
 }
 
@@ -48,6 +50,7 @@ export const withinRangeCeiling = (source: number, destination: number, percenta
  */
 export const withinRangeFloor = (source: number, destination: number, percentage: number) => {
   const diff = (destination / 100) * percentage
+
   return source >= destination - diff
 }
 
@@ -62,7 +65,7 @@ export const round = (source: number, decimalPlaces = 0) => {
     return source
   }
 
-  return parseFloat(source.toFixed(decimalPlaces))
+  return Number.parseFloat(source.toFixed(decimalPlaces))
 }
 
 /**
@@ -82,6 +85,7 @@ export const typicalPrice = (prices: PriceRange[]): number => {
   const highestInRange = prices.map(p => p.highest).sort((a, b) => b - a)[0]
   const lowestInRange = prices.map(p => p.lowest).sort((a, b) => a - b)[0]
   const lastCloseInRange = prices.sort((a, b) => (a.closeAtUtc > b.closeAtUtc ? -1 : 1))[0].close
+
   return round((highestInRange + lowestInRange + lastCloseInRange) / 3, 2)
 }
 
@@ -111,6 +115,7 @@ export const max = (items: number[]) => {
  */
 export const averageBy = (items: number[], count: number, decimalPlaces = 2) => {
   const sum = items.reduce((sum, m) => sum + m, 0)
+
   return round(sum / count, decimalPlaces)
 }
 
@@ -120,11 +125,10 @@ export const averageBy = (items: number[], count: number, decimalPlaces = 2) => 
  * @param decimalPlaces
  * @returns
  */
-export const sum = (items: number[], decimalPlaces = 2) =>
-  round(
-    items.reduce((sum, m) => sum + m, 0),
-    decimalPlaces
-  )
+export const sum = (items: number[], decimalPlaces = 2) => round(
+  items.reduce((sum, m) => sum + m, 0),
+  decimalPlaces,
+)
 
 /**
  * Sum up
@@ -188,16 +192,4 @@ export const sortNumAscending = (n1: number, n2: number): number => {
  */
 export const sortNumDescending = (n1: number, n2: number): number => {
   return n2 - n1
-}
-
-export const sumProduct = (callback, ar1, ar2) => {
-  if (ar1.length !== ar2.length) throw new RangeError()
-
-  let sum = 0
-
-  for (let i = 0; i < ar1.length; i++) {
-    if (callback(ar1[i], ar2[i])) sum += ar1[i] * ar2[i]
-  }
-
-  return sum
 }

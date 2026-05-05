@@ -1,6 +1,6 @@
 import type { Context as OpenAPIContext } from 'openapi-backend'
-import { Context, type ApiHandler } from '@nodevault/platform.components.context'
-import { AuthInfo } from '@nodevault/platform.components.common'
+import type { Context, ApiHandler } from '@nodevault/platform.components.context'
+import { User } from '@nodevault/platform.components.domain'
 import { authoriseUser } from './security.js'
 
 /**
@@ -20,13 +20,13 @@ const wrap = (handler: ApiHandler) => async (c: OpenAPIContext, context: Context
   context.event.params = c.request.params
 
   // set up the context.user which has been constructed in the `security` handler
-  context.user = (c.security.jwt as AuthInfo) ?? null
+  context.user = (c.security.jwt as User) ?? null
 
   if (!context.user) {
-    context.user = (await authoriseUser(c, false)) ?? new AuthInfo()
+    context.user = (await authoriseUser(c, false)) ?? new User()
   }
 
-  context.user.authorised = c.security.authorized
+  context.authorised = c.security.authorized
 
   // execute the handler
   return await handler(context)
@@ -34,7 +34,8 @@ const wrap = (handler: ApiHandler) => async (c: OpenAPIContext, context: Context
 
 export const wrapHandlersWithContextSignature = (handlers: Record<string, ApiHandler>): Record<string, OpenApiHandler> => {
   const r: Record<string, OpenApiHandler> = {}
-  Object.keys(handlers).forEach(key => {
+
+  Object.keys(handlers).forEach((key) => {
     r[key] = wrap(handlers[key])
   })
   return r

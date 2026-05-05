@@ -5,7 +5,7 @@ import {
   type ApiRequestOptions,
   type AuthTokens,
   type QueryParams,
-} from './types'
+} from './types.js'
 
 const fields = new Set(['limit', 'offset', 'sortBy', 'page'])
 
@@ -27,13 +27,12 @@ export class ApiClient {
   }
 
   buildQuery = <T extends QueryParams>(url: string, query: T): string => {
-    query.limit = query.limit ?? 24
-    query.page = query.page ?? 1
+    const q = { limit: 24, page: 1, ...query }
 
     const params = new URLSearchParams({
-      limit: query.limit.toString(),
-      offset: (query.offset ?? (query.page! - 1) * query.limit).toString(),
-      sortBy: query.sortBy ?? 'createdAtUTC_desc',
+      limit: q.limit.toString(),
+      offset: (q.offset ?? (q.page - 1) * q.limit).toString(),
+      sortBy: q.sortBy ?? 'createdAtUTC_desc',
     })
 
     Object.keys(query)
@@ -98,7 +97,12 @@ export class ApiClient {
 
       return new ApiResponseWrapper<T>(response._data as T, response.status, request.path!, response.headers)
     } catch (error: any) {
-      return new ApiResponseWrapper<T>(error.response?._data, error.response?.status, request.path!, error.response?.headers ?? new Headers())
+      return new ApiResponseWrapper<T>(
+        error.response?._data ?? { message: 'Network error', status: '503' },
+        error.response?.status ?? 503,
+        request.path!,
+        error.response?.headers ?? new Headers(),
+      )
     }
   }
 
@@ -113,11 +117,5 @@ export class ApiClient {
         'x-authorization-id': tokens.id,
       }),
     }
-  }
-
-  calculatePageNumber = (limit: number, offset: number): number => {
-    if (limit <= 0) return 1
-
-    return Math.floor(offset / limit) + 1
   }
 }

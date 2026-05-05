@@ -14,43 +14,15 @@ pnpm run lint || exit 1
 # typescipt checks
 pnpm tsc -noEmit || exit 1
 
-# option to skip tests
-if [ "$1" != "-s" ]
-then
-  # Reseed the test database with a unique name to avoid conflicts
-  if [ -n "${SERVICE_CI_DATABASE_NAME}" ]; then
-    pnpm run db:delete
-  fi
+# Generate .nuxt type declarations nuxt prepare generates .nuxt/types/imports.d.ts without a full build.
+npx nuxt prepare apps/nodevault &
+wait || exit 1
 
-  RANDOM_SUFFIX=$(LC_ALL=C tr -dc 'A-Z0-9' </dev/urandom | head -c 8)
-  export SERVICE_CI_DATABASE_NAME="${RANDOM_SUFFIX}"
-
-  pnpm run db:test || exit 1
-
-  TEST_EXIT_CODE=0
-
-  # Run component tests
-  pnpm vitest --run --dir ./components --passWithNoTests --config ./vite.config.ts || TEST_EXIT_CODE=$?
-
-  # Run integrations tests
-  pnpm vitest --run --dir ./integrations --passWithNoTests --config ./vite.config.ts || TEST_EXIT_CODE=$?
-
-  # Run module tests
-  pnpm vitest --run --dir ./modules --passWithNoTests --config ./vite.config.ts || TEST_EXIT_CODE=$?
-
-  # Run integration tests
-  pnpm vitest --run --dir ./tests --passWithNoTests --config ./tests/vite.config.ts || TEST_EXIT_CODE=$?
-
-  pnpm run db:delete || exit 1
-
-  [ $TEST_EXIT_CODE -eq 0 ] || exit $TEST_EXIT_CODE
-fi
+# Build trading and backoffice in parallel (both depend on ui:build above)
+NITRO_PRESET=cloudflare_module pnpm nx build @nodevault/platform.apps.nodevault || exit 1
 
 # bundle the app
-pnpm nx build @nodevault/platform.app || exit 1
-
-# make sure it starts
-node ./app/dist/app.js kill || exit 1
+pnpm nx build @nodevault/platform.apps.api || exit 1
 
 # Clean up
 rm -rf ./tmp

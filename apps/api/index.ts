@@ -1,7 +1,7 @@
 import { Api } from '@nodevault/platform.components.api.server'
-import { apiHandlers } from './handlers'
 import { composeOpenApiDocument } from '@nodevault/platform.components.api.schemas'
 import { indexes, models } from '@nodevault/platform.components.domain'
+import { apiHandlers } from './handlers/index.js'
 
 /**
  * services/local is our local web server so we can run all APIs at the same time locally
@@ -14,21 +14,19 @@ import { indexes, models } from '@nodevault/platform.components.domain'
 const start = async () => {
   const api = new Api(
     {
-      host: 'local.nodevault.cloud',
-      port: 8001,
-      local: true
+      host: 'dev.nodevault.cloud',
+      port: 9002,
     },
     {
-      database: "NodeVault",
       name: 'nodevault',
       api: apiHandlers,
       models: models,
       indexes: indexes,
-      document: composeOpenApiDocument
-    }
+      document: composeOpenApiDocument,
+    },
   )
 
-  await api.start(false)
+  await api.start()
 }
 
 start()

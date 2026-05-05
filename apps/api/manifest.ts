@@ -13,10 +13,10 @@ import { apiHandlers } from './handlers/index.js'
  */
 
 export const manifest: IApiManifest = {
-  database: "NodeVault",
+  database: 'NodeVault',
   name: 'nodevault',
   api: apiHandlers,
   models,
   indexes,
-  document: composeOpenApiDocument
+  document: composeOpenApiDocument,
 }

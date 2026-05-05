@@ -14,10 +14,10 @@ describe('RavenDB Util Tests', () => {
           lat: 0.5555,
           stuff: {
             override: true,
-            ignore: 'false'
-          }
-        }
-      }
+            ignore: 'false',
+          },
+        },
+      },
     }
 
     const patch = {
@@ -27,10 +27,10 @@ describe('RavenDB Util Tests', () => {
         postcode: 'test',
         coordinates: {
           stuff: {
-            override: false
-          }
-        }
-      }
+            override: false,
+          },
+        },
+      },
     }
 
     const patched = utils.patchDocument(doc, patch)

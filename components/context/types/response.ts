@@ -1,6 +1,7 @@
 import { createMD5Hash } from '@nodevault/platform.components.utils'
 import type { StandardResponse, ValidationError } from '@nodevault/platform.components.api.schemas'
-import { FileContent } from '../../api/server/types/file.js'
+import type { AppError } from '@nodevault/platform.components.domain'
+import type { FileContent } from '../../api/server/types/file.js'
 
 export type ResponseValue = string | object
 
@@ -86,7 +87,7 @@ export class Response {
     if (file.metadata) {
       Object.keys(file.metadata)
         .filter(key => file.metadata[key] !== undefined)
-        .forEach(key => {
+        .forEach((key) => {
           this.headers[`x-file-metadata-${key.toLowerCase()}`] = file.metadata[key]
         })
     }
@@ -141,11 +142,11 @@ export class Response {
         {
           path: path,
           message: message,
-          data
-        }
+          data,
+        },
       ],
       undefined,
-      code
+      code,
     )
     return this
   }
@@ -169,27 +170,26 @@ export class Response {
   unauthorised(): Response {
     this.statusCode = 401
     this.body = this.buildResponse(
-      code.statusCode == 440 ? 'Login Time-out' : 'Unauthorised',
-      code.message,
-      production ? undefined : error?.stack || undefined,
-      code.name,
-      body
+      'Unauthorised',
+      'You are not authorised to access this resource',
     )
 
     return this
   }
 
-  forbidden(error?: Error): Response {
+  forbidden(): Response {
     this.statusCode = 403
     this.body = this.buildResponse('forbidden', 'You do not have access to this resource')
     return this
   }
 
-  error(error: Error): Response {
+  error(error: AppError): Response {
     this.statusCode = 500
     this.body = this.buildResponse(
       'error',
-      "An unexpected error has occurred",
+      `An unexpected error has occurred: ${error.message}`,
+      error.stack,
+      error.name,
     )
     return this
   }
@@ -199,28 +199,28 @@ export class Response {
     message: string,
     stack: string | undefined = undefined,
     code: string | undefined = undefined,
-    body: any = undefined
+    body: any = undefined,
   ): StandardResponse {
     return {
       status,
       message,
       stack,
       code,
-      body
+      body,
     }
   }
 
   buildValidationResponse(
     validation: ValidationError[] = [],
     stack: string | undefined = undefined,
-    code: string = 'ValidationError'
+    code: string = 'ValidationError',
   ): StandardResponse {
     return {
       status: 'validation',
       message: 'One or more validation errors have occurred',
       validation,
       stack,
-      code
+      code,
     }
   }
 }

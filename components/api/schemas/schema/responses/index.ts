@@ -1,2 +1,3 @@
-export * from './base'
-export * as auth from './auth/index'
+export * from './base.js'
+export * as auth from './auth/index.js'
+export * as account from './account/index.js'

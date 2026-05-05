@@ -1,12 +1,8 @@
 import { DocumentStore, type IAuthOptions, type ObjectTypeDescriptor, DocumentConventions } from 'ravendb'
-import { configuration } from '@nodevault/platform.components.configuration'
-import { SystemSettings } from '@nodevault/platform.components.common'
+import { serverConfiguration } from '../configuration/server/index.js'
 import { MigrationRegistry } from './migrations.js'
 
-/**
- * Singleton instance of a document store for each database so we dont create more than one for each running app instance
- */
-const stores: Record<string, DocumentStore> = {}
+let storeInstance: DocumentStore
 
 /**
  * Document store is used to configure the database and to create sessions, sessions are very lightweight, DocumentStore less so
@@ -14,11 +10,11 @@ const stores: Record<string, DocumentStore> = {}
  * @param models all domain models used by this process
  * @returns
  */
-export const createDocumentStore = (name: string, models?: Record<string, ObjectTypeDescriptor>): DocumentStore => {
+export const createDocumentStore = (models?: Record<string, ObjectTypeDescriptor>): DocumentStore => {
   // By registering our models with the document store RavenDB will know to track these entities when used within a session
   const registerModels = (s: DocumentStore) => {
     if (models) {
-      Object.values(models).forEach(model => {
+      Object.values(models).forEach((model) => {
         s.conventions.registerEntityType(model)
       })
     }
@@ -36,52 +32,47 @@ export const createDocumentStore = (name: string, models?: Record<string, Object
       use the name passed in, otherwise we just use the name from configuration which will be
       the correct database for the environment we're in
    */
-  const database =
-    configuration.ravendb.databases[name] && configuration.developer
-      ? configuration.developer.startsWith('IntegrationTests_') || configuration.developer.startsWith('e2e')
-        ? configuration.developer
-        : `Platform_${configuration.developer || 'Dev'}`
-      : (configuration.ravendb.databases[name] ?? name)
+  const database = serverConfiguration.ravendb.database
 
-  if (stores[database]) {
+  if (storeInstance) {
     // make sure all the models are registered (the store may be initialised by
     // multiple processes using different models each time)
-    registerModels(stores[database])
+    registerModels(storeInstance)
     // return the cached store
-    return stores[database]
+    return storeInstance
   }
 
   const cert: IAuthOptions = {
-    certificate: configuration.ravendb.certificate,
-    type: 'pem'
+    certificate: serverConfiguration.ravendb.certificate,
+    type: 'pem',
   }
 
-  const authOptions: IAuthOptions = configuration.ravendb.certificate ? cert : null
-  const store = new DocumentStore(configuration.ravendb.endpoints, database, authOptions)
+  storeInstance = serverConfiguration.ravendb.certificate
+    ? new DocumentStore(serverConfiguration.ravendb.endpoints, database, cert)
+    : new DocumentStore(serverConfiguration.ravendb.endpoints, database)
 
-  registerModels(store)
+  registerModels(storeInstance)
 
-  store.conventions.registerEntityType(MigrationRegistry)
-  store.conventions.registerEntityType(SystemSettings)
+  storeInstance.conventions.registerEntityType(MigrationRegistry)
 
   // Will throw ConcurrencyError is we attempt to update a document that was updated since we loaded it
   // RavenDB does not use locking, so there may be occasions when we need to handle concurrency exceptions
-  store.conventions.useOptimisticConcurrency = true
+  storeInstance.conventions.useOptimisticConcurrency = true
 
   // if the entity has a collection field use this for the collection name,
   // otherwise use the default which is pluralised name of the model
-  store.conventions.findCollectionName = (type: any): string => {
+  storeInstance.conventions.findCollectionName = (type: any): string => {
     if (type.collection) return type.collection // collection needs to be a static field on the model class
+
     return DocumentConventions.defaultGetCollectionName(type)
   }
 
   // This allows us to identify the collection documents belong to by reading the private collection field
   // this is only relevant for object literals not classes derived from BaseModel
-  store.conventions.findCollectionNameForObjectLiteral = (entity: any): string => {
+  storeInstance.conventions.findCollectionNameForObjectLiteral = (entity: any): string => {
     return entity.collection || 'Singletons' // default to Singletons
   }
 
-  store.initialize()
-  stores[database] = store
-  return store
+  storeInstance.initialize()
+  return storeInstance
 }

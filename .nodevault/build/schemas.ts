@@ -1,7 +1,6 @@
 /* eslint-disable quotes */
-import { writeFileSync, readFileSync, cpSync, mkdirSync } from 'node:fs'
-// ts-expect-error known type
-import OpenAPI from 'openapi-typescript-codegen'
+import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
+import { generate as generateOpenApi } from 'openapi-typescript-codegen'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
@@ -22,7 +21,7 @@ const generate = async (doc: string, input: string, output: string) => {
   writeFileSync(input, doc)
 
   // generate the typescript types from the schema file
-  await OpenAPI.generate({
+  await generateOpenApi({
     input: input,
     output: output,
     exportCore: false,

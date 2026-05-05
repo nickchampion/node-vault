@@ -12,9 +12,9 @@ export type ApiDefinition = {
  * @param originalAjv
  * @returns
  */
-const addCustomFormats: AjvCustomizer = originalAjv => {
+const addCustomFormats: AjvCustomizer = (originalAjv) => {
   originalAjv.addFormat('date-time', /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?Z$/)
-  //TODO: remove optional space once FE has updated otherwise we cant parse phone number properly
+  // TODO: remove optional space once FE has updated otherwise we cant parse phone number properly
   originalAjv.addFormat('phone-number', /^\+[0-9]{1,3}[ ]*[0-9]{6,15}$/)
   originalAjv.addFormat('coordinates', /^(\+|-)*([0-9]{1,3})\.([0-9]{5,12})$/)
   originalAjv.addFormat('alpha-numeric', /^[A-Za-z0-9- ]+$/)
@@ -28,23 +28,23 @@ const addCustomFormats: AjvCustomizer = originalAjv => {
 
 export const buildApiDefinitions = (manifest: IApiManifest): ApiDefinition => {
   const api = new OpenAPIBackend({
-      definition: manifest.document(),
-      handlers: wrapHandlersWithContextSignature(manifest.api),
-      strict: true,
-      customizeAjv: addCustomFormats,
-      ajvOpts: {
-        validateFormats: true,
-        allErrors: true,
-        strict: false
-      },
-      quick: true
-    })
+    definition: manifest.document(),
+    handlers: wrapHandlersWithContextSignature(manifest.api),
+    strict: true,
+    customizeAjv: addCustomFormats,
+    ajvOpts: {
+      validateFormats: true,
+      allErrors: true,
+      strict: false,
+    },
+    quick: true,
+  })
 
-    registerSecurityHandler(api)
-    registerGlobalHandlers(api)
+  registerSecurityHandler(api)
+  registerGlobalHandlers(api)
 
-  return  {
+  return {
     manifest: manifest,
-    server: api
+    server: api,
   }
 }

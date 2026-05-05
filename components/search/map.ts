@@ -1,8 +1,9 @@
-import { last } from 'rambda'
-import { type Facet, SearchContext, FacetMap, type IAggregation, type FacetTerm, type FacetTermAggregation } from './entities.js'
-import { FacetResult, FacetValue } from 'ravendb'
+import { last, groupBy, titleCaseFirst, trimEnd } from '@nodevault/platform.components.utils'
+import type { FacetResult, FacetValue } from 'ravendb'
+import type {
+  SearchContext, FacetMap, Facet, IAggregation, FacetTerm, FacetTermAggregation,
+} from './entities.js'
 import { StatelessQuerystring } from './querystring.js'
-import { groupBy, titleCaseFirst, trimEnd } from '@nodevault/platform.components.utils'
 import type { ISearchFilter } from './filters/index.js'
 
 /**
@@ -62,8 +63,8 @@ export const activeFilters = (searchContext: SearchContext): SearchContext => {
           name: t.name,
           clearUrl: t.url,
           id: t.id,
-          hits: t.hits
-        }))
+          hits: t.hits,
+        })),
     }))
 
   return searchContext
@@ -72,7 +73,7 @@ export const activeFilters = (searchContext: SearchContext): SearchContext => {
 export const mapCustomFacets = (searchContext: SearchContext) => {
   if (searchContext.docsOnly) return searchContext
 
-  searchContext.customFacets.forEach(f => {
+  searchContext.customFacets.forEach((f) => {
     const activeFacet = searchContext.querystring.isLastElement(f.name)
     const disabled = !activeFacet
 
@@ -83,18 +84,19 @@ export const mapCustomFacets = (searchContext: SearchContext) => {
       name: f.name,
       selected: searchContext.querystring.contains(f.name),
       active: activeFacet,
-      terms: Object.keys(f.terms).map(key => {
+      terms: Object.keys(f.terms ?? {}).map((key) => {
         const selected = searchContext.event.query[f.name] && searchContext.event.query[f.name] === key
+
         return {
-          name: f.terms[key],
+          name: f.terms![key],
           hits: searchContext.results.totalDocs,
           selected,
           id: key,
           state: selected && disabled ? 'checked disabled' : selected ? 'checked' : disabled ? 'disabled' : '',
           url: getFacetTermUrl(f.name, key, selected, searchContext.querystring),
-          replaceUrl: searchContext.querystring.addOrReplace(f.name, key, true)
+          replaceUrl: searchContext.querystring.addOrReplace(f.name, key, true),
         }
-      })
+      }),
     }
 
     searchContext.results.facets.push(facet)
@@ -109,9 +111,9 @@ const mapFacets = (searchContext: SearchContext, results: FacetResult[]) => {
 
   return results
     .filter(fr => fr.name !== '@AllResults')
-    .map(f => {
+    .map((f) => {
       const filter = searchContext.facetFilters.find(ff => ff.name.toLowerCase() === f.name.toLowerCase())
-      const disabled = activeFacet && activeFacet.name !== f.name && filter != null
+      const disabled = !!(activeFacet && activeFacet.name !== f.name && filter != null)
       const facetName = `f:${f.name}`
       const facetMap = searchContext.facetMaps[f.name] ?? null
 
@@ -121,8 +123,8 @@ const mapFacets = (searchContext: SearchContext, results: FacetResult[]) => {
         disabled: disabled,
         name: facetName,
         selected: searchContext.querystring.contains(facetName),
-        active: activeFacet && activeFacet.name === f.name,
-        terms: mapTerms(searchContext, f, facetMap, filter, disabled, facetName)
+        active: !!(activeFacet && activeFacet.name === f.name),
+        terms: mapTerms(searchContext, f, facetMap, filter, disabled, facetName),
       }
 
       return facet
@@ -133,19 +135,20 @@ const mapTerms = (
   searchContext: SearchContext,
   facetResult: FacetResult,
   facetMap: FacetMap,
-  filter: ISearchFilter,
+  filter: ISearchFilter | undefined,
   disabled: boolean,
-  facetName: string
+  facetName: string,
 ): FacetTerm[] => {
   const ranges = groupBy(facetResult.values, 'range') as Record<string, FacetValue[]>
 
   return (
     Object.keys(ranges)
       .filter(v => v !== 'NULL_VALUE')
-      .map(range => {
+      .map((range) => {
         const base = ranges[range][0]
         const selected = filter ? filter.matches(base.range) : false
         const id = findFacetId(facetMap, base.range)
+
         return <FacetTerm>{
           name: findFacetTerm(facetMap, base.range),
           hits: base.count,
@@ -154,7 +157,7 @@ const mapTerms = (
           state: selected && disabled ? 'checked disabled' : selected ? 'checked' : disabled ? 'disabled' : '',
           url: getFacetTermUrl(facetName, id, selected, searchContext.querystring),
           replaceUrl: searchContext.querystring.addOrReplace(facetName, id, true),
-          aggregations: mapTermAggregations(ranges[range])
+          aggregations: mapTermAggregations(ranges[range]),
         }
       })
       // support filters in the map to exclude terms as needed
@@ -162,37 +165,38 @@ const mapTerms = (
   )
 }
 
-const mapTermAggregations = (facetValues: FacetValue[]): Record<string, FacetTermAggregation> => {
-  if (facetValues.length === 1 && !facetValues[0].name) return null
+const mapTermAggregations = (facetValues: FacetValue[]): Record<string, FacetTermAggregation> | undefined => {
+  if (facetValues.length === 1 && !facetValues[0].name) return undefined
 
   const aggregations: Record<string, FacetTermAggregation> = {}
-  facetValues.forEach(fv => {
+
+  facetValues.forEach((fv) => {
     aggregations[fv.name] = {
       sum: fv.sum,
       average: fv.average,
       min: fv.min,
-      max: fv.max
+      max: fv.max,
     }
   })
   return aggregations
 }
 
-const mapAggregations = (searchContext: SearchContext): IAggregation[] => {
+const mapAggregations = (searchContext: SearchContext): void => {
   const facetResult = searchContext.facetResults && searchContext.facetResults['@AllResults']
 
   if (!facetResult) return
 
-  searchContext.results.aggregations = searchContext.results.aggregations.concat(
-    facetResult.values.map((v: FacetValue) => ({
-      unit: null,
-      name: v.name,
-      sum: v.sum,
-      hits: v.count,
-      min: v.min,
-      max: v.max,
-      average: v.average
-    }))
-  )
+  const aggregations: IAggregation[] = facetResult.values.map((v: FacetValue) => ({
+    unit: '',
+    name: v.name,
+    sum: v.sum,
+    hits: v.count,
+    min: v.min,
+    max: v.max,
+    average: v.average,
+  }))
+
+  searchContext.results.aggregations = searchContext.results.aggregations.concat(aggregations)
 }
 
 const findFacetId = (map: FacetMap, termId: string) => {
@@ -201,7 +205,9 @@ const findFacetId = (map: FacetMap, termId: string) => {
 
 const findFacetTerm = (map: FacetMap, termId: string) => {
   if (!map) return termId
+
   const term = map.map ? map.map(termId).toLowerCase() : termId
+
   return map.terms && map.terms[term] ? map.terms[term] : map.termMap ? map.termMap(term) : term
 }
 

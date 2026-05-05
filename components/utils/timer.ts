@@ -1,15 +1,15 @@
-export default class {
+export default class Timer {
   start: number
 
   constructor() {
-    this.start = new Date().valueOf()
+    this.start = Date.now()
   }
 
   elasped() {
-    return `${new Date().valueOf() - +this.start}ms since start`
+    return `${Date.now() - +this.start}ms since start`
   }
 
   stop() {
-    return new Date().valueOf() - +this.start
+    return Date.now() - +this.start
   }
 }

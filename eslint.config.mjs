@@ -3,7 +3,7 @@ import pluginVueA11y from 'eslint-plugin-vuejs-accessibility'
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 import stylistic from '@stylistic/eslint-plugin'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
-import customPlugin from './.hectare/eslint/index.mjs'
+import customPlugin from './.nodevault/eslint/index.mjs'
 
 export default createConfigForNuxt(
   {
@@ -59,6 +59,7 @@ export default createConfigForNuxt(
         'unicorn/filename-case': 'off',
         'unicorn/empty-brace-spaces': 'off',
         'unicorn/prefer-top-level-await': 'off',
+        'unicorn/no-array-method-this-argument': 'off',
 
         '@typescript-eslint/no-unused-vars': [
           'error',
@@ -520,5 +521,5 @@ export default createConfigForNuxt(
       },
     })
   .append({
-    ignores: ['**/ios/**/*', '**/android/**/*', '**/.storybook/**/*', '**/.nuxt/**/*', '**/.output/**/*', '**/*.d.ts', '**/*.yml', 'docs/**/*'],
+    ignores: ['**/.nuxt/**/*', '**/.output/**/*', '**/*.d.ts', '**/*.yml', 'docs/**/*', 'components/api/schemas/models/models/*.ts'],
   })

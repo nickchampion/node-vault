@@ -1,3 +1,5 @@
 export * as models from './models/models.js'
 export * as indexes from './indexes/index.js'
-export * from './models'
+export * from './models/index.js'
+export * from './types/index.js'
+export * from './collections.js'

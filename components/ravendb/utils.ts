@@ -1,14 +1,14 @@
-import { BaseModel, Errors, HectareError, Page, QuerySettings, collections } from '@nodevault/platform.components.common'
+import { type Page, type QuerySettings, type BaseModel, collections, GeneralError } from '@nodevault/platform.components.domain'
 import { randomAlphaNumeric } from '@nodevault/platform.components.utils'
 import {
-  FacetBase,
+  type FacetBase,
+  type IndexQuery,
+  type QueryStatistics,
   FacetBuilder,
+  PatchByQueryOperation,
   type IDocumentQuery,
   type IDocumentSession,
   type IDocumentStore,
-  IndexQuery,
-  PatchByQueryOperation,
-  QueryStatistics
 } from 'ravendb'
 
 class Utils {
@@ -20,16 +20,17 @@ class Utils {
 
   buildFacet<T>(builder: (facetBuilder: FacetBuilder<T>) => void): FacetBase {
     const ff = new FacetBuilder<T>()
+
     builder(ff)
     return ff.getFacet()
   }
 
   applyFilters<T extends BaseModel>(query: IDocumentQuery<T>, settings: QuerySettings): IDocumentQuery<T> {
     Object.keys(settings.filters ?? [])
-      .filter(k => settings.filters[k])
-      .forEach(key => {
-        const negate = settings.filters[key][0] === '-'
-        const value = negate ? settings.filters[key].toString().substring(1) : settings.filters[key].toString()
+      .filter(k => settings.filters![k])
+      .forEach((key) => {
+        const negate = settings.filters![key][0] === '-'
+        const value = negate ? settings.filters![key].toString().slice(1) : settings.filters![key].toString()
 
         if (value.includes(',')) {
           query = negate
@@ -58,33 +59,35 @@ class Utils {
   }
 
   async page<T extends BaseModel>(limit: number, offset: number, query: IDocumentQuery<T>): Promise<Page<T>> {
-    let stats: QueryStatistics = null
+    let stats: QueryStatistics | null = null
 
     const q = query.take(limit).skip(offset)
     const result = q.statistics(s => (stats = s)).lazily() // lazily incase we've issued other lazy queries in the session
 
     return {
       docs: await result.getValue(),
-      totalDocs: stats.totalResults,
+      totalDocs: (stats as QueryStatistics | null)?.totalResults ?? 0,
       limit: limit,
-      offset: offset
+      offset: offset,
     }
   }
 
-  patchDocument<T>(source: T, patch: unknown): T {
-    Object.keys(patch).forEach(key => {
+  patchDocument<T>(source: T, patch: Record<string, any>): T {
+    const target = source as Record<string, any>
+
+    Object.keys(patch).forEach((key) => {
       if (typeof patch[key] === 'object' && patch[key] != null && !Array.isArray(patch[key])) {
-        if (source[key] && typeof source[key] !== 'object') {
-          throw new HectareError(Errors.Format(Errors.Platform.SessionInvalidPatchField, key))
+        if (target[key] && typeof target[key] !== 'object') {
+          throw new GeneralError('Invalid patch script')
         }
 
         // make sure its initialised incase source is null or undefined
-        if (!source[key]) source[key] = {}
+        if (!target[key]) target[key] = {}
 
         // sync all fields on the patch object
-        this.patchDocument<T>(source[key], patch[key])
+        this.patchDocument(target[key], patch[key])
       } else {
-        source[key] = patch[key]
+        target[key] = patch[key]
       }
     })
     return source
@@ -93,6 +96,7 @@ class Utils {
   async patchServer(store: IDocumentStore, patchQuery: IndexQuery, waitForCompletion = true): Promise<void> {
     const p = new PatchByQueryOperation(patchQuery)
     const operation = await store.operations.send(p)
+
     if (waitForCompletion) await operation.waitForCompletion()
   }
 
@@ -102,7 +106,7 @@ class Utils {
     patch: (session: IDocumentSession, doc: T) => Promise<void>,
     batchSize = 1024,
     maxRequestsPerSession?: number,
-    filter?: (q: IDocumentQuery<T>) => IDocumentQuery<T>
+    filter?: (q: IDocumentQuery<T>) => IDocumentQuery<T>,
   ): Promise<void> {
     const index = new model().getIndexName()
     // used to allow us to go through all docs patching them as we process them and querying by the patch key
@@ -117,7 +121,7 @@ class Utils {
       session.advanced.waitForIndexesAfterSaveChanges({
         indexes: [index],
         throwOnTimeout: false,
-        timeout: 120000
+        timeout: 120000,
       })
 
       let query = session.query<T>({ indexName: index })

@@ -1,28 +1,31 @@
-import { SearchContext } from './entities.js'
-import { QueryStatistics, Lazy, type FacetResultObject, Facet } from 'ravendb'
+import type { QueryStatistics, Lazy, Facet, type IDocumentQuery, type FacetResultObject } from 'ravendb'
 import { getValueByPath, fakeLazy, isPromise } from '@nodevault/platform.components.utils'
-import { BaseModel } from '@nodevault/platform.components.common'
+import type { BaseModel } from '@nodevault/platform.components.common'
 import { utils } from '@nodevault/platform.components.ravendb'
+import type { SearchContext } from './entities.js'
+
+type IDocumentQueryWithParams = IDocumentQuery<BaseModel> & { _queryParameters?: unknown }
 
 const applyAggregations = (searchContext: SearchContext): Lazy<FacetResultObject> => {
   let aggregationQuery = searchContext.facetQuery.aggregateBy(searchContext.facets[0])
 
-  searchContext.facets.slice(1).forEach(f => {
+  searchContext.facets.slice(1).forEach((f) => {
     aggregationQuery = aggregationQuery.andAggregateBy(f)
   })
 
   return aggregationQuery.executeLazy()
 }
 
-const applyActiveFacetAggregation = (searchContext: SearchContext): Lazy<FacetResultObject> => {
+const applyActiveFacetAggregation = (searchContext: SearchContext): Lazy<FacetResultObject> | null => {
   if (!searchContext.activeFilter) return null
 
-  const facetToApply = searchContext.facets.find(f => (<Facet>f).fieldName === searchContext.activeFilter.name)
+  const filterName = searchContext.activeFilter.name
+  const facetToApply = searchContext.facets.find(f => (<Facet>f).fieldName === filterName)
 
   return facetToApply ? searchContext.facetQueryActive.aggregateBy(facetToApply).executeLazy() : null
 }
 
-const applyCustomFacetAggregation = (searchContext: SearchContext): Lazy<FacetResultObject> => {
+const applyCustomFacetAggregation = (searchContext: SearchContext): Lazy<FacetResultObject> | null => {
   if (!searchContext.customFacetQuery || !searchContext.customFacetBuilder) return null
 
   return searchContext.customFacetQuery.aggregateBy(utils.buildFacet(searchContext.customFacetBuilder)).executeLazy()
@@ -30,19 +33,21 @@ const applyCustomFacetAggregation = (searchContext: SearchContext): Lazy<FacetRe
 
 export const execute = async (searchContext: SearchContext): Promise<SearchContext> => {
   // configure statistics and get the lazy results
-  let stats: QueryStatistics = null
+  let stats: QueryStatistics | null = null
 
   if (searchContext.includes && searchContext.docs) {
-    Object.keys(searchContext.includes).forEach(key => {
+    Object.keys(searchContext.includes).forEach((key) => {
       searchContext.query = searchContext.query.include(searchContext.includes[key])
     })
   }
 
   // append the query we've executed to any logs for this request
+  const query = searchContext.query as IDocumentQueryWithParams
+
   searchContext.log.capture('query', searchContext.query.toString())
   searchContext.log.capture(
     'parameters',
-    searchContext.query['_queryParameters'] ? JSON.stringify(searchContext.query['_queryParameters']) : null
+    query._queryParameters ? JSON.stringify(query._queryParameters) : null,
   )
 
   if (searchContext.selectFields?.length && searchContext.docs) {
@@ -51,21 +56,21 @@ export const execute = async (searchContext: SearchContext): Promise<SearchConte
 
   const lazyResults = searchContext.docs ? searchContext.query.statistics(s => (stats = s)).lazily() : fakeLazy([])
   const lazyAggregationResults = searchContext.docsOnly || !searchContext.facets?.length ? null : applyAggregations(searchContext)
-  const lazyActiveFacetAggregationResults =
-    searchContext.docsOnly || !searchContext.facets?.length ? null : applyActiveFacetAggregation(searchContext)
-  const lazyCustomFacetAggregationResults =
-    searchContext.docsOnly || !searchContext.facets?.length || !searchContext.customFacetQuery
-      ? null
-      : applyCustomFacetAggregation(searchContext)
+  const lazyActiveFacetAggregationResults = searchContext.docsOnly || !searchContext.facets?.length ? null : applyActiveFacetAggregation(searchContext)
+  const lazyCustomFacetAggregationResults = searchContext.docsOnly || !searchContext.facets?.length || !searchContext.customFacetQuery
+    ? null
+    : applyCustomFacetAggregation(searchContext)
 
   // materialise the results, this sends all 3 queries to the server in one request
   const results = (await lazyResults.getValue()) as BaseModel[]
 
-  searchContext.facetResults = lazyAggregationResults ? await lazyAggregationResults.getValue() : null
+  searchContext.facetResults = lazyAggregationResults
+    ? await lazyAggregationResults.getValue()
+    : (null as unknown as FacetResultObject)
   searchContext.facetQueryActiveResults = lazyActiveFacetAggregationResults
     ? await lazyActiveFacetAggregationResults.getValue()
-    : null
-  searchContext.results.setStats(stats, searchContext.settings)
+    : (null as unknown as FacetResultObject)
+  searchContext.results.setStats(stats ?? undefined, searchContext.settings)
 
   if (lazyCustomFacetAggregationResults) {
     searchContext.customFacetResultMap(searchContext, await lazyCustomFacetAggregationResults.getValue())
@@ -76,6 +81,7 @@ export const execute = async (searchContext: SearchContext): Promise<SearchConte
     for (const result of results) {
       for (const key of Object.keys(searchContext.includes)) {
         const id = getValueByPath(result, searchContext.includes[key])
+
         result[key] = await searchContext.session.get(id)
       }
     }

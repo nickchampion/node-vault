@@ -1,16 +1,16 @@
-import { BaseModel, collections } from '@nodevault/platform.components.common'
+import type { BaseModel } from '@nodevault/platform.components.domain'
 import type { IDocumentQuery } from 'ravendb'
 import type { ISearchFilter } from './searchFilter.js'
 
 export class StandardFilter implements ISearchFilter {
   name: string
-  negate: boolean
+  negate: boolean | undefined
   terms: string[]
   operator: 'AND' | 'OR' = 'OR' // default operator for standard filters
 
   constructor(name: string, terms: string[], operator?: 'AND' | 'OR') {
     this.name = name
-    this.terms = collections.map(this.name, terms) as string[]
+    this.terms = terms
     this.operator = operator || this.operator
   }
 

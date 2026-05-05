@@ -16,21 +16,21 @@ describe('Convert keys tests', () => {
         postal_code: '55441',
         city: 'Musterhausen',
         state: 'Niedersachsen',
-        country: 'DEU'
+        country: 'DEU',
       },
       bank_accounts: [
         {
           iban: 'string',
           bic: 'string',
-          currency: 'EUR'
+          currency: 'EUR',
         },
         {
           sort_code: 'string',
           account_number: 'string',
           bank_code: 'string',
-          currency: 'GBP'
-        }
-      ]
+          currency: 'GBP',
+        },
+      ],
     }
 
     const camel = convertKeys(source, snakeToCamelCase)

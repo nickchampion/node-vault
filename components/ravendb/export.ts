@@ -1,6 +1,6 @@
+import type { Writable } from 'node:stream'
 import { format } from 'fast-csv'
 import type { IDocumentQuery, IDocumentSession, IRawDocumentQuery } from 'ravendb'
-import { Writable } from 'stream'
 
 export interface IExporter<T extends object, TResult> {
   headers: string[]
@@ -14,7 +14,7 @@ export interface IExporter<T extends object, TResult> {
 export class CsvExporter<T extends object, TResult> {
   session: IDocumentSession
   settings: IExporter<T, TResult>
-  processor: (document: T) => void
+  processor: ((document: T) => void) | undefined
 
   constructor(session: IDocumentSession, settings: IExporter<T, TResult>, processor?: (document: T) => void) {
     this.session = session
@@ -23,18 +23,22 @@ export class CsvExporter<T extends object, TResult> {
   }
 
   async export(): Promise<Writable> {
+    if (!this.settings.rawQuery && !this.settings.query) {
+      throw new Error('CsvExporter requires either a query or rawQuery on settings')
+    }
+
     const stream = this.settings.rawQuery
       ? await this.session.advanced.stream<T>(this.settings.rawQuery)
-      : await this.session.advanced.stream<T>(this.settings.query)
+      : await this.session.advanced.stream<T>(this.settings.query!)
 
     const csvStream = format({
       headers: this.settings.headers,
       writeHeaders: this.settings.writeHeaders ?? true,
-      delimiter: ','
+      delimiter: ',',
     })
 
     return new Promise((resolve, reject) => {
-      stream.on('data', data => {
+      stream.on('data', (data) => {
         try {
           if (this.processor) this.processor(data.document)
 
@@ -44,19 +48,19 @@ export class CsvExporter<T extends object, TResult> {
 
           if (row) {
             if (Array.isArray(row)) {
-              row.forEach(r => {
+              row.forEach((r) => {
                 csvStream.write(r)
               })
             } else {
               csvStream.write(row)
             }
           }
-        } catch (e) {
-          reject(e)
+        } catch (error) {
+          reject(error)
         }
       })
 
-      stream.on('error', err => {
+      stream.on('error', (err) => {
         reject(err)
       })
 

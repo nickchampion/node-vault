@@ -1,8 +1,8 @@
+import { URLSearchParams } from 'node:url'
 import { last, trimEnd } from '@nodevault/platform.components.utils'
-import { URLSearchParams } from 'url'
 
 export class StatelessQuerystring {
-  elements: Record<string, string>
+  elements!: Record<string, string>
   uri: string
 
   constructor(uri: string) {
@@ -52,7 +52,7 @@ export class StatelessQuerystring {
     return Object.prototype.hasOwnProperty.call(this.elements, key)
   }
 
-  containsValue(key: string, value: string, delimeter: string = null) {
+  containsValue(key: string, value: string, delimeter: string | null = null) {
     if (!this.elements[key]) return false
 
     if (delimeter !== null) {
@@ -64,9 +64,11 @@ export class StatelessQuerystring {
 
   remove(keys: string[], encode = false) {
     const u = keys.reduce((current, key) => {
-      const regex = new RegExp('([?&]*)(' + key + ')=[^?&]+(&?)', 'g')
+      const regex = new RegExp(`([?&]*)(${key})=[^?&]+(&?)`, 'g')
+
       return current.replace(regex, '$1')
     }, this.uri)
+
     return encode ? this.encode(trimEnd(u, '&')) : trimEnd(u, '&')
   }
 
@@ -79,53 +81,53 @@ export class StatelessQuerystring {
   }
 
   replace(key: string, value: string) {
-    const regex = new RegExp('([?&]*' + key + ')=[^?&]+', 'g')
+    const regex = new RegExp(`([?&]*${key})=[^?&]+`, 'g')
+
     return this.uri.replace(regex, `$1=${value}`)
   }
 
   replaceMultiple(items: Record<string, string>) {
     return Object.keys(items).reduce((current, key) => {
-      const regex = new RegExp('([?&]*)(' + key + ')=[^?&]+(&?)', 'g')
+      const regex = new RegExp(`([?&]*)(${key})=[^?&]+(&?)`, 'g')
+
       return current.replace(regex, `$1=${items[key]}`)
     }, this.uri)
   }
 
   addOrReplace(key: string, value: string, encode = false) {
     if (this.contains(key)) return this.replace(key, value)
+
     const token = Object.keys(this.elements).length === 0 ? (this.uri.indexOf('?') > 0 ? '' : '?') : '&'
     const result = `${this.uri}${token}${key}=${value}`
+
     return encode ? this.encode(result) : result
   }
 }
 
 export class StatefulQuerystring extends StatelessQuerystring {
-  constructor(uri: string) {
-    super(uri)
-  }
-
-  remove(keys: string[]) {
+  override remove(keys: string[]) {
     this.uri = super.remove(keys)
 
-    keys.forEach(k => {
+    keys.forEach((k) => {
       delete this.elements[k]
     })
 
     return this.uri
   }
 
-  replace(key: string, value: string) {
+  override replace(key: string, value: string) {
     this.uri = super.replace(key, value)
     this.elements[key] = value
     return this.uri
   }
 
-  replaceMultiple(items: Record<string, string>) {
+  override replaceMultiple(items: Record<string, string>) {
     this.uri = super.replaceMultiple(items)
 
     const keys = Object.keys(items)
 
-    Object.keys(this.elements).forEach(k => {
-      keys.forEach(rk => {
+    Object.keys(this.elements).forEach((k) => {
+      keys.forEach((rk) => {
         if (rk === k) {
           this.elements[k] = items[rk]
         }
@@ -135,7 +137,7 @@ export class StatefulQuerystring extends StatelessQuerystring {
     return this.uri
   }
 
-  addOrReplace(key: string, value: string) {
+  override addOrReplace(key: string, value: string) {
     if (this.contains(key)) return this.replace(key, value)
 
     this.uri = super.addOrReplace(key, value)

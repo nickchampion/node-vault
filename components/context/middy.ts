@@ -1,7 +1,7 @@
-import { Context } from './index.js'
+import { normalizeError } from '@nodevault/platform.components.domain'
 import type { EventHandler, ApiHandler, IMiddleware, Middleware } from './types/index.js'
 import { contextMiddleware } from './middleware/index.js'
-import { configuration } from '@nodevault/platform.components.configuration'
+import type { Context } from './index.js'
 
 /**
  * Component to handle executing an API or Event handler and wrapping the call with any configured middleware components.
@@ -14,12 +14,12 @@ import { configuration } from '@nodevault/platform.components.configuration'
 export const middy = async (
   context: Context,
   handler: ApiHandler | EventHandler,
-  middleware?: IMiddleware[]
+  middleware?: IMiddleware[],
 ): Promise<Context> => {
   let wrapper = configure(handler).use(contextMiddleware())
 
   // set up any middleware passed in by the service
-  middleware?.forEach(m => {
+  middleware?.forEach((m) => {
     wrapper = wrapper.use(m)
   })
 
@@ -41,11 +41,13 @@ const configure = (baseHandler: ApiHandler | EventHandler) => {
     const { before, after, error } = middleware
 
     if (!before && !after && !error) {
-      throw new Error("Errors.Platform.InvalidMiddleware")
+      throw new Error('Errors.Platform.InvalidMiddleware')
     }
 
     if (before) instance.before(before)
+
     if (after) instance.after(after)
+
     if (error) instance.error(error)
 
     return instance
@@ -73,22 +75,22 @@ const execute = async (
   before: Middleware[],
   baseHandler: ApiHandler | EventHandler,
   after: Middleware[],
-  error: Middleware[]
+  error: Middleware[],
 ) => {
   try {
     await run(context, before)
     await baseHandler(context)
     await run(context, after)
-  } catch (e) {
+  } catch (error_) {
     try {
-      context.error = e
+      context.error = error_
       await run(context, error)
-    } catch (ex) {
-      ex.context = context
-      throw ex
+    } catch (error_) {
+      (error_ as { context?: Context }).context = context
+      throw error_
     } finally {
       // set the response based on the error raised
-      context.event.response.error(context.error, configuration.production)
+      context.event.response.error(normalizeError(context.error))
     }
   }
 }

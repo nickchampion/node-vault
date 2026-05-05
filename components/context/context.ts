@@ -1,25 +1,17 @@
 import type { IDocumentStore } from 'ravendb'
 import { Session } from '@nodevault/platform.components.ravendb'
-import {
-  EventSource,
-} from '@nodevault/platform.components.common'
-import { Postgres } from './sql/index.js'
+import type { AppError, User } from '@nodevault/platform.components.domain'
+import { InboundEvent } from './types/event.js'
+import { Log, type LogLevel } from './log.js'
 
 type ContextEvent = (context: Context) => Promise<void> | void
-
-/**
- * function type opassed to context to create get a postgres connection
- * if its needed by the executing code, this allows Lambdas to manage the connection
- * outside the function code to prevent a connection per function execution.
- */
-export type PostgresConnection = () => Postgres
 
 /**
  * function type passed to context to create get an IDocumentStore connection
  * if its needed by the executing code, this allows Lambdas to manage the connection
  * outside the function code to prevent a connection per function execution
  */
-export type RavenDBConnection = () => IDocumentStore
+export type RavenDBConnection = () => IDocumentStore | null
 
 export interface ContextEvents {
   error: ContextEvent
@@ -34,25 +26,63 @@ export interface ContextEvents {
  * entities that provide functionality that cuts across all handlers
  */
 export class Context {
-  public store: IDocumentStore
+  public store: IDocumentStore | null
   public session: Session
-  public event: EventSource
-  public user: User
-  public props: Record<string, unknown> = {}
+  public event: InboundEvent
+  public user: User | undefined
+  public authorised: boolean = false
+  public props: Record<string, any> = {}
   public ravendb: RavenDBConnection
+  public error?: AppError | unknown
+  public log: Log
 
-  public constructor(ravendb: RavenDBConnection) {
-    this.store = ravendb ? ravendb() : null
+  private eventListeners: Record<string, ContextEvent[]> = {}
+
+  public constructor(ravendb: RavenDBConnection, logLevel: LogLevel = 'info') {
+    this.store = ravendb()
     this.session = new Session(this.store)
     this.ravendb = ravendb
+    this.log = new Log(logLevel)
+    this.event = new InboundEvent()
   }
 
-  public setEventSource(event: EventSource) {
+  public setEventSource(event: InboundEvent) {
     this.event = event
     return this
   }
 
-  public setAuthInfo(user: AuthInfo) {
+  public setUser(user: User) {
     this.user = user
+  }
+
+  /**
+   * Register a listener for the specified session event
+   * @param event
+   * @param listener
+   */
+  public on<T extends keyof ContextEvents>(event: T, listener: ContextEvents[T]) {
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = []
+    }
+
+    this.eventListeners[event].push(listener)
+  }
+
+  /**
+   * Raise an event and invoke event listeners asyncronously
+   * @param event
+   * @param arg
+   * @returns
+   */
+  public async emit<T extends keyof ContextEvents>(event: T): Promise<void> {
+    const events = this.eventListeners[event] || []
+
+    for (const evt of events) {
+      try {
+        await evt(this)
+      } catch (error) {
+        this.log.error(`Listener for "${event}" threw`, error)
+      }
+    }
   }
 }

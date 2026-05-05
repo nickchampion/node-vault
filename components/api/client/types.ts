@@ -1,15 +1,43 @@
-import type { Facets, StandardResponse, SearchResults } from '@nodevault/platform.clients.common'
-import type { ILogger } from '@nodevault/platform.libs.services'
-import { ValidationErrors } from '@nodevault/platform.libs.types'
+import type { StandardResponse } from '@nodevault/platform.components.api.schemas'
 
-export type Facet = Facets
-export type FacetTerm = NonNullable<Facets['terms']>[number]
-export type Aggregation = NonNullable<FacetTerm['aggregations']>[keyof NonNullable<FacetTerm['aggregations']>]
-export type ErrorsBySection = Record<string, Record<string, string>>
-export type ApiFunction = <T>(url: string, options: ApiRequestOptions) => Promise<ApiResponse<T>>
+export class ValidationErrors {
+  errors: Record<string, string[]> = {}
 
-export type ApiSearchResults<T> = Omit<SearchResults, 'docs'> & {
-  docs: Array<T>
+  constructor(errors?: Record<string, string[]>) {
+    if (errors) {
+      this.errors = { ...errors }
+    }
+  }
+
+  get(key: string): string[] {
+    return this.errors[key] || []
+  }
+
+  first(): string {
+    return Object.values(this.errors)?.[0]?.[0] || ''
+  }
+
+  delete(key: string): void {
+    delete this.errors[key]
+  }
+
+  set(key: string, messages: string[]): void {
+    this.errors[key] = messages
+  }
+
+  any(): boolean {
+    return Object.keys(this.errors).length > 0
+  }
+}
+
+export type KeyValuePair = {
+  key: string
+  value: string
+}
+
+export type KeyNumericPair = {
+  key: string
+  value: number
 }
 
 export interface LocationHeaders {
@@ -59,7 +87,6 @@ export interface ApiOptions {
   tokens?: AuthTokens
   reauth?: () => Promise<ApiOptions>
   device: string
-  sentry: ILogger
   version: string
 }
 
@@ -70,6 +97,7 @@ export type ApiResponse<T> = {
   headers: Record<string, string>
   success: boolean
   status: 'ok' | 'error' | 'validation' | 'conflict'
+  httpStatus: number
   maintenance: boolean
   url: string
   location: LocationHeaders
@@ -109,6 +137,7 @@ export class ApiResponseWrapper<T> {
       error: this.success() ? null : this.data as StandardResponse,
       errors: this.errors,
       status: this.success() ? 'ok' : this.validation() ? 'validation' : this.conflict() ? 'conflict' : 'error',
+      httpStatus: this.status,
       success: this.success(),
       headers: this.headers,
       maintenance: this.headers['x-maintenance-mode'] === 'true',

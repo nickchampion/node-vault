@@ -1,8 +1,7 @@
-import { Response } from './response.js'
-import { Context } from '../context.js'
 import type { ObjectTypeDescriptor } from 'ravendb'
-import { OpenAPIV3 } from 'openapi-types'
-import type { EventsHandler } from './events.js'
+import type { OpenAPIV3 } from 'openapi-types'
+import type { Context } from '../context.js'
+import type { Response } from './response.js'
 
 /**
  * Signature for API handlers
@@ -29,7 +28,6 @@ export interface IMiddleware {
 }
 
 export interface IApiManifest {
-  database: string
   name: string
   api: Record<string, ApiHandler>
   models: Record<string, ObjectTypeDescriptor>
@@ -40,6 +38,6 @@ export interface IApiManifest {
 export interface IEventsManifest {
   database: string
   name: string
-  events: EventsHandler
+  // events: EventsHandler
   models: Record<string, ObjectTypeDescriptor>
 }

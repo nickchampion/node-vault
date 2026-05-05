@@ -1,6 +1,5 @@
-import { BaseModel, Errors, HectareError, Page, QuerySettings } from '@nodevault/platform.components.common'
-import { getValueByPath } from '@nodevault/platform.components.utils'
-import { DateTime } from 'luxon'
+import { GeneralError, type AppError, type BaseModel, type Page, type QuerySettings } from '@nodevault/platform.components.domain'
+import { getValueByPath, nowUtcIso } from '@nodevault/platform.components.utils'
 import type { IDocumentQuery, IDocumentSession, IDocumentStore } from 'ravendb'
 import { utils } from './utils.js'
 
@@ -20,16 +19,16 @@ export interface SessionEvents {
  */
 export class Session {
   private eventListeners: Record<string, SessionEvent[]> = {}
-  private errorListeners: ((error: Error) => Promise<HectareError> | HectareError)[] = []
+  private errorListeners: ((error: Error) => Promise<AppError> | AppError)[] = []
 
   // used by get requests to indicate we want to save the session, usually we dont commit the session on a get
   public commitOnGet: boolean
-  public database: IDocumentSession
+  public database: IDocumentSession | null
   public veto: boolean
   public commited: boolean
-  public documentStore: IDocumentStore
+  public documentStore: IDocumentStore | null
 
-  constructor(store: IDocumentStore) {
+  constructor(store: IDocumentStore | null) {
     this.documentStore = store
     this.database = store ? store.openSession() : null
     this.veto = false
@@ -55,13 +54,13 @@ export class Session {
     this.errorListeners = []
   }
 
-  assertInit() {
-    if (!this.database) throw new HectareError(Errors.Platform.SessionNotInitialised)
+  assertInit(): asserts this is this & { database: IDocumentSession } {
+    if (!this.database) throw new GeneralError('Session has not been initialised')
   }
 
   reset() {
     this.dispose()
-    this.database = this.documentStore.openSession()
+    this.database = this.documentStore?.openSession() ?? null
   }
 
   /**
@@ -73,6 +72,7 @@ export class Session {
     if (!this.eventListeners[event]) {
       this.eventListeners[event] = []
     }
+
     this.eventListeners[event].push(listener)
   }
 
@@ -80,7 +80,7 @@ export class Session {
    * Register a listener for the event error event which is triggered when an event listener fails
    * @param listener
    */
-  onEventError(listener: (error: Error) => Promise<HectareError> | HectareError) {
+  onEventError(listener: (error: Error) => Promise<AppError> | AppError) {
     this.errorListeners.push(listener)
   }
 
@@ -90,7 +90,7 @@ export class Session {
    * @param arg
    * @returns
    */
-  private async emit<T extends keyof SessionEvents>(event: T, arg: Session | IDocumentStore): Promise<void> {
+  private async emit<T extends keyof SessionEvents>(event: T, arg: Session | IDocumentStore | null): Promise<void> {
     const events = this.eventListeners[event]
 
     if (!events) return
@@ -100,9 +100,9 @@ export class Session {
     for (const evt of events) {
       try {
         await evt(sessionFactory())
-      } catch (e) {
+      } catch (error) {
         for (const err of this.errorListeners) {
-          err(e)
+          err(error as Error)
         }
       }
     }
@@ -127,10 +127,10 @@ export class Session {
 
       // only set if commit was successful
       this.commited = true
-    } catch (e) {
+    } catch (error) {
       // emit the error event
       await this.emit('commitError', this.documentStore)
-      throw e
+      throw error
     } finally {
       this.dispose()
     }
@@ -150,15 +150,15 @@ export class Session {
     const records: TResult[] = []
 
     return new Promise((resolve, reject) => {
-      s.on('data', data => {
+      s.on('data', (data) => {
         try {
           records.push(map ? map(data) : data.document)
-        } catch (e) {
-          reject(e)
+        } catch (error) {
+          reject(error)
         }
       })
 
-      s.on('error', err => {
+      s.on('error', (err) => {
         reject(err)
       })
 
@@ -175,7 +175,7 @@ export class Session {
   async store<T extends BaseModel>(source: T): Promise<void> {
     this.assertInit()
 
-    source.createdAtUTC = DateTime.utc().toISO()
+    source.createdAtUTC = nowUtcIso()
     source.updatedAtUTC = source.createdAtUTC
     await this.database.store<T>(source)
   }
@@ -194,15 +194,16 @@ export class Session {
 
       if (doc) {
         if (beforePatch) await beforePatch(doc)
-        doc.updatedAtUTC = DateTime.utc().toISO()
+
+        doc.updatedAtUTC = nowUtcIso()
         utils.patchDocument(doc, patch)
         return doc
       } else {
-        throw new HectareError(Errors.Format(Errors.Platform.SessionDocumentNotFound, patch.id))
+        throw new GeneralError(`Session document with ID ${patch.id} not foundSessionDocumentNotFound`)
       }
     }
 
-    throw new HectareError(Errors.Platform.SessionInvalidPatch)
+    throw new GeneralError('Session invalid patch')
   }
 
   /**
@@ -218,13 +219,14 @@ export class Session {
   async get<T extends BaseModel>(id: string, includes?: Record<string, string>, applyIncludes?: boolean): Promise<T> {
     this.assertInit()
 
-    let doc: T
+    let doc: T | null
 
     if (includes) {
       const keys = Object.keys(includes)
 
       if (keys.length > 0) {
         let r = this.database.include(includes[keys[0]])
+
         for (const key in keys.slice(1)) {
           r = r.include(includes[key])
         }
@@ -239,11 +241,12 @@ export class Session {
     if (doc && includes && applyIncludes) {
       for (const key of Object.keys(includes)) {
         const id = getValueByPath(doc, includes[key])
-        doc[key] = id ? await this.get(id) : null
+
+        ;(doc as any)[key] = id ? await this.get(id) : null
       }
     }
 
-    return doc
+    return doc as T
   }
 
   /**
@@ -253,7 +256,9 @@ export class Session {
    */
   async delete<T extends BaseModel>(doc: T): Promise<void> {
     this.assertInit()
+
     if (!doc) return
+
     await this.database.delete<T>(doc)
   }
 
@@ -263,8 +268,9 @@ export class Session {
    * @returns
    */
   query<T extends BaseModel>(modelOrIndexName: (new () => T) | string): IDocumentQuery<T> {
+    this.assertInit()
     return this.database.query<T>({
-      indexName: typeof modelOrIndexName == 'string' ? modelOrIndexName : new modelOrIndexName().getIndexName()
+      indexName: typeof modelOrIndexName == 'string' ? modelOrIndexName : new modelOrIndexName().getIndexName(),
     })
   }
 
@@ -281,18 +287,18 @@ export class Session {
     modelOrIndexName: (new () => T) | string,
     settings: QuerySettings,
     includes?: Record<string, string>,
-    augment?: (q: IDocumentQuery<T>) => IDocumentQuery<T>
+    augment?: (q: IDocumentQuery<T>) => IDocumentQuery<T>,
   ): Promise<Page<T>> {
     this.assertInit()
 
     let query = this.database.query<T>({
-      indexName: typeof modelOrIndexName == 'string' ? modelOrIndexName : new modelOrIndexName().getIndexName()
+      indexName: typeof modelOrIndexName == 'string' ? modelOrIndexName : new modelOrIndexName().getIndexName(),
     })
 
     query = utils.applyFilters(query, settings)
 
     if (includes) {
-      Object.keys(includes).forEach(key => {
+      Object.keys(includes).forEach((key) => {
         query = query.include(includes[key])
       })
     }
@@ -306,7 +312,7 @@ export class Session {
         docs: [],
         totalDocs: await query.count(),
         limit: settings.limit,
-        offset: settings.offset
+        offset: settings.offset,
       }
     }
 

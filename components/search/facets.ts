@@ -1,13 +1,13 @@
 import type { Value, KeyValuePair } from '@nodevault/platform.components.common'
 import { toObject as toObject } from '@nodevault/platform.components.utils'
-import { FacetMap } from './entities.js'
+import type { FacetMap } from './entities.js'
 
 export const getFacetMap = (
   name: string,
   displayName: string,
   values: Value[],
   map?: (t: string) => string,
-  filter?: (t: string, id: string) => boolean
+  filter?: (t: string, id: string) => boolean,
 ): FacetMap => {
   return {
     name,
@@ -17,9 +17,9 @@ export const getFacetMap = (
       values,
       n => n.id.toString(),
       false,
-      n => n.name
+      n => n.name,
     ),
-    filter
+    filter,
   }
 }
 
@@ -29,7 +29,7 @@ export const getFacetMapKvp = (
   values?: KeyValuePair[],
   map?: (t: string) => string,
   termMap?: (t: string) => string,
-  filter?: (t: string, id: string) => boolean
+  filter?: (t: string, id: string) => boolean,
 ): FacetMap => {
   return {
     name,
@@ -38,24 +38,23 @@ export const getFacetMapKvp = (
     termMap,
     terms: values
       ? toObject(
-          values,
-          n => n.key,
-          false,
-          n => n.value
-        )
+        values,
+        n => n.key,
+        false,
+        n => n.value,
+      )
       : null,
-    filter
+    filter,
   }
 }
 
-export const getFacetMapBoolYesNo = (name: string, displayName: string) =>
-  getFacetMapKvp(name, displayName, [
-    {
-      key: 'true',
-      value: 'Yes'
-    },
-    {
-      key: 'false',
-      value: 'No'
-    }
-  ])
+export const getFacetMapBoolYesNo = (name: string, displayName: string) => getFacetMapKvp(name, displayName, [
+  {
+    key: 'true',
+    value: 'Yes',
+  },
+  {
+    key: 'false',
+    value: 'No',
+  },
+])

@@ -1,26 +1,33 @@
 import Koa from 'koa'
 import { koaBody } from 'koa-body'
-import { configuration } from '@nodevault/platform.components.configuration'
 import {
   type ApiHandler,
   Context,
   type IApiManifest,
   type IMiddleware,
-  EventSource,
+  InboundEvent,
   Response,
   middy,
 } from '@nodevault/platform.components.context'
 import { createDocumentStore } from '@nodevault/platform.components.ravendb'
 import { copyFields, sleep, Timer, tryClone } from '@nodevault/platform.components.utils'
-import { DocumentStore } from 'ravendb'
-import { type ApiDefinition, buildApiDefinitions } from './definition.js'
-import multer from '../koa/multer.js'
+import type { ValidationError } from '@nodevault/platform.components.api.schemas'
+import type { DocumentStore } from 'ravendb'
 import compress from 'koa-compress'
+import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import multer from '../koa/multer.js'
+import { type ApiDefinition, buildApiDefinitions } from './definition.js'
+
+const mapValidationErrors = (validation: { errors?: { path?: string, message?: string }[] | null }): ValidationError[] => {
+  return (validation.errors ?? []).map(err => ({
+    path: err.path ?? '',
+    message: err.message ?? '',
+  }))
+}
 
 export type ApiOptions = {
   port: number
   host: string
-  local: boolean
 }
 
 /**
@@ -41,16 +48,9 @@ export class Api {
       'authorization',
       'content-type',
       'accept-version',
-      'x-correlation-id',
-      'x-authorization-id',
       'x-authorization-refresh',
-      'x-organisation-id',
-      'x-organisation-name',
-      'x-impersonation',
       'x-timezone-offset',
-      'x-device-info',
-      'x-e2e-database-name',
-      'x-version'
+      'x-version',
     ],
     responseHeaders: [
       'cf-lat',
@@ -61,14 +61,14 @@ export class Api {
       'accept-version',
       'cache-control',
       'x-elapsed',
-      'x-api-version'
+      'x-api-version',
     ],
-    allowOrigin: ['dev', 'local'].includes(configuration.environment.environment) ? '*' : configuration.appHost
+    allowOrigin: ['dev'].includes(serverConfiguration.environment.environment) ? '*' : serverConfiguration.app,
   }
 
   constructor(
     options: ApiOptions,
-    api: IApiManifest
+    api: IApiManifest,
   ) {
     this.options = options
     this.middleware = []
@@ -99,7 +99,7 @@ export class Api {
    * to handle the request we call the module.api.handleRequest method which is an OpenAPIBackend
    * method which will then match the incoming path to a openapi operation specified in the modules OpenAPI document
    */
-  async start(kill: boolean = false) {
+  async start() {
     try {
       const t = new Timer()
 
@@ -119,13 +119,10 @@ export class Api {
       app.listen(this.options.port, this.options.host)
 
       // Api has started
-      console.log(`Server listening, port \x1b[33m${this.options.port}\x1b[0m in \x1b[32m${t.stop()}ms\x1b[0m`)
-
-      // this is used locally when verifying bundling of the app to ensure it starts successfully
-      if (kill) process.exit(0)
-    } catch (e) {
-      console.error(e)
-      process.exit(1)
+      console.log(`Server listening, port \u001B[33m${this.options.port}\u001B[0m in \u001B[32m${t.stop()}ms\u001B[0m`)
+    } catch (error) {
+      console.error(error)
+      throw error
     }
   }
 
@@ -134,21 +131,15 @@ export class Api {
     console.error(error)
 
     // exit process in local to raise awareness of this error
-    if (configuration.local) {
+    if (serverConfiguration.dev) {
       console.error('handleUnhandledRejection')
-      process.exit(1)
+      throw error
     }
   }
 
   initialiseDocumentStore = () => {
-    // Find the database from the first module (all modules for a given service must use a single database)
-    const database = this.api.manifest.database
-
-    // extract all models used by this database
-    const models = this.api.manifest.models
-
     // Create the document store
-    this.store = createDocumentStore(database, models)
+    this.store = createDocumentStore(this.api.manifest.models)
   }
 
   /**
@@ -173,7 +164,7 @@ export class Api {
     return {
       message,
       method: koa.request.method?.toLowerCase(),
-      path: koa.request.path
+      path: koa.request.path,
     }
   }
 
@@ -195,7 +186,7 @@ export class Api {
    * @returns
    */
   handleRoute = async (koa: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>): Promise<void> => {
-    let buildEvent: () => EventSource
+    let buildEvent: () => InboundEvent
 
     try {
       if (koa.method?.toLowerCase() == 'options') {
@@ -208,7 +199,7 @@ export class Api {
       // this will slow down the first request to each API on local though
       if (!this.api.server.initalized) await this.api.server.init()
 
-      const operation = this.api.server.router.matchOperation(koa.request)
+      const operation = this.api.server.router.matchOperation(koa.request as any)
 
       if (!operation) {
         koa.status = 404
@@ -221,22 +212,22 @@ export class Api {
 
       // factory method to build the event for each attempt at invoking the API
       buildEvent = () => {
-        const evt = new EventSource({
+        const evt = new InboundEvent({
           query: copyFields(koa.query),
           payload: tryClone(koa.request['body']),
-          body: koa.request.body ? koa.request.body[unparsed] : null,
+          body: koa.request.body ? (koa.request.body as any)[unparsed] : null,
           path: koa.path,
           method: koa.method?.toLowerCase(),
           headers: copyFields(koa.headers),
           type: 'http',
           operation: operation.path,
-          version: configuration.version,
+          version: serverConfiguration.version,
           clientVersion: (koa.headers['x-version'] || 'unknown').toString(),
           // files: koa.request['files'] as any as Record<string, FileUpload>,
           pathAndQuery:
             queryKeys.length > 0
-              ? `${operation.path}?${queryKeys.map(key => key + '=' + koa.request.query[key]).join('&')}`
-              : operation.path
+              ? `${operation.path}?${queryKeys.map(key => `${key}=${koa.request.query[key]}`).join('&')}`
+              : operation.path,
         })
 
         return evt
@@ -248,21 +239,22 @@ export class Api {
         try {
           await this.tryHandleRoute(buildEvent(), this.api, koa)
           return
-        } catch (e: any) {
-          if (e.name && e.name === 'ConcurrencyException') {
-            if (i === retries) throw e
-            await sleep(50) //wait for 50ms and try again
+        } catch (error: any) {
+          if (error.name && error.name === 'ConcurrencyException') {
+            if (i === retries) throw error
+
+            await sleep(50) // wait for 50ms and try again
           } else {
-            throw e
+            throw error
           }
         }
       }
-    } catch (e: any) {
-      koa.body = new Response().error(e).body
+    } catch (error: any) {
+      koa.body = new Response().error(error).body
       koa.status = 500
       koa.set('access-control-allow-origin', this.settings.allowOrigin)
       koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
-      koa.set('x-api-version', configuration.version)
+      koa.set('x-api-version', serverConfiguration.version)
     }
   }
 
@@ -273,14 +265,14 @@ export class Api {
    * @returns
    */
   tryHandleRoute = async (
-    event: EventSource,
+    event: InboundEvent,
     api: ApiDefinition,
-    koa: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>
+    koa: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>,
   ): Promise<void> => {
     // base handler which invokes the OpenAPIBackend API, by this point the before middleware components have run
     // so we just pass the request to OpenAPiBackEnd to process authentication, request validation and routing
-    const base: ApiHandler = async context => {
-      return await api.server.handleRequest(koa.request, context)
+    const base: ApiHandler = async (context) => {
+      return await api.server.handleRequest(koa.request as any, context)
     }
 
     const db = () => this.store!
@@ -291,17 +283,16 @@ export class Api {
 
     // set response headers, body and status code
     koa.set('access-control-allow-origin', this.settings.allowOrigin)
-    koa.set('x-api-version', configuration.version)
+    koa.set('x-api-version', serverConfiguration.version)
     koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
 
-    Object.keys(context.event.response.headers).forEach(header => {
+    Object.keys(context.event.response.headers).forEach((header) => {
       koa.set(header, context.event.response.headers[header])
     })
 
-    koa.body =
-      context.event.response.statusCode === 404
-        ? this.notFound(koa, 'Requested resource was not found')
-        : context.event.response.body
+    koa.body = context.event.response.statusCode === 404
+      ? this.notFound(koa, 'Requested resource was not found')
+      : context.event.response.body
 
     if (this.settings.redirectStatusCodes.includes(context.event.response.statusCode)) {
       koa.redirect(context.event.response.headers['location']) // redirect to another page
@@ -317,17 +308,17 @@ export class Api {
     app.use(
       multer({
         limits: {
-          fileSize: 10 * 1024 * 1024
-        }
-      }).any()
+          fileSize: 10 * 1024 * 1024,
+        },
+      }).any() as unknown as Koa.Middleware,
     )
 
     // parse body
     app.use(
       koaBody({
         multipart: false, // handled by multer middleware above
-        includeUnparsed: true
-      })
+        includeUnparsed: true,
+      }),
     )
 
     // compress responses
@@ -337,31 +328,32 @@ export class Api {
     app.use(ctx => this.handleRoute(ctx))
   }
 
-   /* /**
+  /* /**
    * Helper function to validate a request with OpenApiBackEnd its referenced on context so
    * we dont need to expose ApiDefinitions
    * @param api
    * @param evt
    * @returns
    */
- validate = (api: ApiDefinition, evt: EventSource): ValidationError[] => {
+  validate = (api: ApiDefinition, evt: InboundEvent): ValidationError[] => {
     try {
       const validation = api.server.validateRequest(
         {
           headers: evt.headers,
           method: evt.method,
-          path: evt.path,
+          path: evt.path ?? '',
           query: evt.query,
-          body: evt.payload
+          body: evt.payload,
         },
-        evt.operation
+        evt.operation,
       )
 
       return validation.valid ? [] : mapValidationErrors(validation)
-    } catch (e) {
+    } catch (error) {
       // so we can support executing handlers that are not mapped to an API endpoint during CSV import
-      if (e.message === 'Unknown operation') return []
-      throw e
+      if ((error as Error).message === 'Unknown operation') return []
+
+      throw error
     }
-  } */
+  }
 }

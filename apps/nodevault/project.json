@@ -1,0 +1,41 @@
+{
+  "name": "@nodevault/platform.apps.nodevault",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/nodevault/app",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "apps/nodevault/**/*.ts"
+        ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi build && cp ./../../.nodevault/cloudflare/worker.mjs ./.output/server/worker.mjs"
+          }
+        ],
+        "cwd": "apps/nodevault"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi dev"
+          }
+        ],
+        "cwd": "apps/nodevault"
+      }
+    }
+  }
+}

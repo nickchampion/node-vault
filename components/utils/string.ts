@@ -7,9 +7,51 @@
 export const trim = (str: string, char: string) => {
   let i = 0
   let j = str.length - 1
+
   while (str[i] === char) i++
   while (str[j] === char) j--
   return str.slice(i, j + 1)
+}
+
+export const simpleHash = (str: string): string => {
+  let hash = 0
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+
+  return Math.abs(hash).toString(36)
+}
+
+export const serializeValue = <T>(value: T): string => {
+  if (value === null || value === undefined) return 'null'
+
+  if (typeof value === 'string') return value
+
+  if (typeof value === 'number') return value.toString()
+
+  if (typeof value === 'boolean') return value.toString()
+
+  if (typeof value === 'object') {
+    if (Array.isArray(value)) {
+      return `[${value.map(serializeValue).join(',')}]`
+    }
+
+    const entries: string[] = []
+
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        entries.push(`${key}:${serializeValue(value[key])}`)
+      }
+    }
+
+    return `{${entries.join(',')}}`
+  }
+
+  return String(value)
 }
 
 export const normalisePostcode = (postcode?: string | null): string | null => {
@@ -37,11 +79,12 @@ export const normalisePostcode = (postcode?: string | null): string | null => {
  */
 export const trimEnd = (str: string, char: string) => {
   let j = str.length - 1
+
   while (str[j] === char) j--
   return str.slice(0, j + 1)
 }
 
-export const obfuscateBetweenIndexes = (str: string, start: number, end: number): string => {
+export const obfuscateBetweenIndexes = (str: string, start: number, end: number): string | null => {
   // Ensure start and end are within the string bounds and start is less than end
   if (start < 0 || end > str.length || start >= end) {
     return null
@@ -63,6 +106,7 @@ export const obfuscateBetweenIndexes = (str: string, start: number, end: number)
  */
 export const trimStart = (str: string, char: string) => {
   let j = 0
+
   while (str[j] === char) j++
   return str.slice(j)
 }
@@ -73,6 +117,7 @@ export const titleCaseFirst = (input: string) => {
 
 export const titleCase = (input: string) => {
   const output = input.toLowerCase().split(' ')
+
   for (let i = 0; i < output.length; i++) {
     output[i] = output[i].charAt(0).toUpperCase() + output[i].slice(1)
   }
@@ -81,7 +126,7 @@ export const titleCase = (input: string) => {
 
 export const format = (key: string, args: string | string[]) => {
   if (typeof args === 'string') {
-    return key.replace(/\{0\}/g, args)
+    return key.replaceAll('{0}', args)
   }
 
   args.forEach((arrayItem, index) => {
@@ -96,23 +141,23 @@ export const invariantCultureCompare = (str1: string, str2: string): boolean => 
 }
 
 export const toAlphaNumeric = (input: string, replacement = '-'): string => {
-  return input ? input.trim().replace(/[\W]+/g, replacement) : null
+  return input ? input.trim().replaceAll(/[\W]+/g, replacement) : ''
 }
 
 export const splitByCamelCase = (input: string, replacement = ' ') => {
-  return input.replace(/([A-Z])/g, `${replacement}$1`)
+  return input.replaceAll(/([A-Z])/g, `${replacement}$1`)
 }
 
-export const camelToSnakeCase = str => str.replace(/[A-Z0-9]/g, letter => `_${letter.toLowerCase()}`)
-export const snakeToCamelCase = str => {
-  return str.replace(/([-_][a-z0-9])/gi, $1 => {
+export const camelToSnakeCase = (str: string): string => str.replaceAll(/[A-Z0-9]/g, (letter: string) => `_${letter.toLowerCase()}`)
+export const snakeToCamelCase = (str: string): string => {
+  return str.replaceAll(/([-_][a-z0-9])/gi, ($1: string) => {
     return $1.toUpperCase().replace('-', '').replace('_', '')
   })
 }
 
 export const tryParseInt = (str: string, defaultValue = 0): number => {
   try {
-    return parseInt(str)
+    return Number.parseInt(str)
   } catch {
     return defaultValue
   }
@@ -120,13 +165,13 @@ export const tryParseInt = (str: string, defaultValue = 0): number => {
 
 export const tryParseFloat = (str: string, defaultValue = 0): number => {
   try {
-    return parseFloat(str)
+    return Number.parseFloat(str)
   } catch {
     return defaultValue
   }
 }
 
-export const tryParseBool = (str: string, defaultValue = null): boolean => {
+export const tryParseBool = (str: string, defaultValue = null): boolean | null => {
   try {
     if (['true', 'y', 'yes'].includes(str.toLowerCase())) {
       return true

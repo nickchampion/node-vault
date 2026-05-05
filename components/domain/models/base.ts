@@ -13,7 +13,7 @@ export abstract class BaseModel {
   }
 
   getId(id: string): string {
-    return !id.includes('/') ? `${this.#collection}/${id}` : id
+    return id.includes('/') ? id : `${this.#collection}/${id}`
   }
 
   getIndexName(): string {
@@ -25,6 +25,6 @@ export abstract class BaseModel {
   }
 
   static friendlyId(id: string): string | null {
-    return id ? (!id?.includes('/') ? id : id.split('/').slice(1).join('/')) : null
+    return id ? (id?.includes('/') ? id.split('/').slice(1).join('/') : id) : null
   }
 }

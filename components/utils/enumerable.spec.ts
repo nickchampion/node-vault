@@ -7,26 +7,27 @@ describe('Enumerable Tests', () => {
         database: 'customers',
         api: {
           name: 'customers',
-          url: 'https://customers.farmto.com'
-        }
+          url: 'https://customers.farmto.com',
+        },
       },
       {
         database: 'customers',
         api: {
           name: 'customers',
-          url: 'https://customers.farmto.com'
-        }
+          url: 'https://customers.farmto.com',
+        },
       },
       {
         database: 'system',
         api: {
           name: 'system',
-          url: 'https://system.farmto.com'
-        }
-      }
+          url: 'https://system.farmto.com',
+        },
+      },
     ]
 
     const databases = groupBy(Object.values(input), 'database')
+
     expect(databases['customers'].length).toBe(2)
     expect(databases['system'].length).toBe(1)
   })

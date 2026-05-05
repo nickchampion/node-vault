@@ -1,10 +1,10 @@
-import { configuration } from '@nodevault/platform.components.configuration'
-import { Session, createDocumentStore } from './index.js'
 import type { IDocumentStore } from 'ravendb'
 import { BaseModel } from '@nodevault/platform.components.common'
 import { randomAlphaNumeric } from '@nodevault/platform.components.utils'
+import { configuration } from '../configuration/server/index.js'
+import { Session, createDocumentStore } from './index.js'
 
-let store: IDocumentStore = null
+let store: IDocumentStore | null = null
 
 beforeAll(async () => {
   store = createDocumentStore(`IntegrationTests_${configuration.ravendb.testDatabaseName}`)
@@ -36,6 +36,7 @@ describe('RavenDB Session Tests', () => {
     // make sure the doc does not exist
     session = new Session(store)
     const doc = await session.get(id)
+
     expect(doc).toBe(null)
   })
 
@@ -44,6 +45,7 @@ describe('RavenDB Session Tests', () => {
 
     {
       const session = new Session(store)
+
       await session.store(new TestModel(id, 'hectare'))
       await session.commit()
     }
@@ -63,13 +65,13 @@ describe('RavenDB Session Tests', () => {
 
     try {
       await session2.commit()
-    } catch (e) {
-      error = e
+    } catch (error_) {
+      error = error_
     }
 
     expect(error).not.toBe(null)
-    expect(error.name).not.toBe(undefined)
-    expect(error.name).toBe('ConcurrencyException')
+    expect((error as Error).name).not.toBe(undefined)
+    expect((error as Error).name).toBe('ConcurrencyException')
   })
 
   test('session commit actions are executed successfully', async () => {
@@ -79,8 +81,8 @@ describe('RavenDB Session Tests', () => {
     await session.store(new TestModel(id, 'hectare'))
 
     // add a commit action to delete the doc we just stored
-    session.on('afterCommit', async s => {
-      await s.database.delete(id)
+    session.on('afterCommit', async (s) => {
+      await s.database!.delete(id)
       await s.commit()
     })
 
@@ -89,6 +91,7 @@ describe('RavenDB Session Tests', () => {
     // make sure the doc does not exist
     session = new Session(store)
     const doc = await session.get(id)
+
     expect(doc).toBe(null)
   })
 
@@ -103,8 +106,8 @@ describe('RavenDB Session Tests', () => {
     // new session try and create again which should fail
     session = new Session(store)
 
-    session.on('commitError', async s => {
-      await s.database.delete(id)
+    session.on('commitError', async (s) => {
+      await s.database!.delete(id)
       await s.commit()
     })
 
@@ -121,6 +124,7 @@ describe('RavenDB Session Tests', () => {
     // make sure the doc does not exist, should have been deleted by rollback actions
     session = new Session(store)
     const doc = await session.get(id)
+
     expect(doc).toBe(null)
   })
 })

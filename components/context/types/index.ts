@@ -1,5 +1,5 @@
 export * from './auth.js'
 export * from './event.js'
-export * from './events.js'
 export * from './manifest.js'
 export * from './response.js'
+export * from '../../domain/types/search.js'

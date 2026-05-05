@@ -1,11 +1,12 @@
-import { DocumentStore } from 'ravendb'
+/* eslint-disable unicorn/no-process-exit */
 import { readdirSync, existsSync } from 'node:fs'
-import { join, resolve, parse } from 'node:path'
-import { createDocumentStore } from './index.js'
+import path from 'node:path'
+import type { DocumentStore } from 'ravendb'
 import { createMD5FileHash, sleep } from '@nodevault/platform.components.utils'
-import { Errors, HectareError } from '@nodevault/platform.components.common'
+import { GeneralError } from '@nodevault/platform.components.domain'
+import { createDocumentStore } from './index.js'
 
-const logOk = msg => console.log(`  \x1b[32m✔\x1b[0m ${msg}`)
+const logOk = (msg: string) => console.log(`  \u001B[32m✔\u001B[0m ${msg}`)
 
 export class MigrationRegistry {
   id: string
@@ -39,12 +40,12 @@ export type Migration = {
 export const execute = async (
   load: (path: string, file: string) => Promise<Migration>,
   database: string,
-  indexes: Record<string, any>
+  indexes: Record<string, any>,
 ) => {
-  let store: DocumentStore
+  let store: DocumentStore | undefined
 
   try {
-    console.log(`\x1b[41m ${database} \x1b[0m Starting migrations...`)
+    console.log(`\u001B[41m ${database} \u001B[0m Starting migrations...`)
 
     store = createDocumentStore(database)
 
@@ -74,11 +75,11 @@ export const execute = async (
     if (appliedTasks.error) throw appliedTasks.error
 
     process.exit(0)
-  } catch (e) {
-    console.error(e)
+  } catch (error) {
+    console.error(error)
     process.exit(1)
   } finally {
-    store.dispose()
+    store?.dispose()
   }
 }
 
@@ -86,13 +87,17 @@ export const saveWithRetries = async (
   store: DocumentStore,
   scripts: Record<string, string>,
   sql: Record<string, string>,
-  tasks: Record<string, Task>
+  tasks: Record<string, Task>,
 ) => {
   for (let i = 1; i <= 3; i += 1) {
     try {
       const session = store.openSession()
 
       const registry = await session.load<MigrationRegistry>(new MigrationRegistry().id)
+
+      if (!registry) {
+        throw new GeneralError('Migration registry not found')
+      }
 
       for (const key in scripts) {
         if (!registry.scripts[key]) {
@@ -115,7 +120,7 @@ export const saveWithRetries = async (
       await session.saveChanges()
     } catch {
       if (i >= 3) {
-        throw new HectareError(Errors.Custom('Migrations', 'Failed to save migration registry'))
+        throw new GeneralError('Failed to save migration registry')
       } else {
         await sleep(1000)
       }
@@ -139,21 +144,23 @@ export const loadRegistry = async (store: DocumentStore) => {
 const loadFiles = async (
   service: string,
   dir: string,
-  load: (path: string, file: string) => Promise<Migration>
+  load: (path: string, file: string) => Promise<Migration>,
 ): Promise<Migration[]> => {
-  let path = `${resolve()}/${dir}`
+  let filePath = `${path.resolve()}/${dir}`
 
-  if (!existsSync(path)) {
-    path = `${resolve()}/services/${service.toLowerCase()}/api/${dir}`
+  if (!existsSync(filePath)) {
+    filePath = `${path.resolve()}/services/${service.toLowerCase()}/api/${dir}`
   }
 
-  if (!existsSync(path)) {
+  if (!existsSync(filePath)) {
     return []
   }
 
-  const files = readdirSync(join(path)).filter(f => f.indexOf('.map') == -1 && f.indexOf('.gitkeep') == -1)
-  return (await Promise.all(files.map(s => load(path, s)))).map(m => {
-    m.name = parse(m.name).name
+  const files = readdirSync(path.join(filePath)).filter(f => !f.includes('.map') && !f.includes('.gitkeep'))
+  const mapped = await Promise.all(files.map(s => load(filePath, s)))
+
+  return mapped.map((m) => {
+    m.name = path.parse(m.name).name
     return m
   })
 }
@@ -161,46 +168,47 @@ const loadFiles = async (
 const executeScripts = async (
   store: DocumentStore,
   field: Record<string, string>,
-  migrations: Migration[]
-): Promise<{ error: Error; applied: Record<string, string> }> => {
+  migrations: Migration[],
+): Promise<{ error: Error | null, applied: Record<string, string> }> => {
   const applied: Record<string, string> = {}
 
   try {
     for (const migration of migrations) {
       if (!Object.prototype.hasOwnProperty.call(field, migration.name)) {
-        const start = new Date().valueOf()
+        const start = Date.now()
+
         await migration.module.up(store)
-        applied[migration.name] = `Executed at: ${new Date().toISOString()} in: ${new Date().valueOf() - start}ms`
+        applied[migration.name] = `Executed at: ${new Date().toISOString()} in: ${Date.now() - start}ms`
         field[migration.name] = applied[migration.name]
-        logOk(`\x1b[44m ${migration.name} \x1b[0m \x1b[32m${new Date().valueOf() - start}ms`)
+        logOk(`\u001B[44m ${migration.name} \u001B[0m \u001B[32m${Date.now() - start}ms`)
       }
     }
-  } catch (e) {
+  } catch (error) {
     return {
-      error: e,
-      applied: applied
+      error: error as Error,
+      applied: applied,
     }
   }
 
   return {
     error: null,
-    applied: applied
+    applied: applied,
   }
 }
 
 const executeTasks = async (
   store: DocumentStore,
   registry: MigrationRegistry,
-  migrations: Migration[]
-): Promise<{ error: Error; applied: Record<string, Task> }> => {
+  migrations: Migration[],
+): Promise<{ error: Error | null, applied: Record<string, Task> }> => {
   const applied: Record<string, Task> = {}
 
   try {
-    const createTask = (name: string) => {
+    const createTask = (name: string): Task => {
       registry.tasks[name] = {
-        id: null,
-        hash: null,
-        changedUTC: null
+        id: 0,
+        hash: '',
+        changedUTC: '',
       }
       return registry.tasks[name]
     }
@@ -221,18 +229,18 @@ const executeTasks = async (
 
         applied[migration.name] = task
 
-        logOk(`\x1b[45m ${migration.name} \x1b[0m ${hash}`)
+        logOk(`\u001B[45m ${migration.name} \u001B[0m ${hash}`)
       }
     }
-  } catch (e) {
+  } catch (error) {
     return {
-      error: e,
-      applied: applied
+      error: error as Error,
+      applied: applied,
     }
   }
 
   return {
     error: null,
-    applied: applied
+    applied: applied,
   }
 }

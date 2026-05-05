@@ -2,7 +2,7 @@ import {
   type IDocumentStore,
   PutCompareExchangeValueOperation,
   DeleteCompareExchangeValueOperation,
-  GetCompareExchangeValueOperation
+  GetCompareExchangeValueOperation,
 } from 'ravendb'
 
 /**
@@ -46,12 +46,14 @@ export class UniqueConstraint<T> {
   acquire = async (value: T): Promise<boolean> => {
     const formatted = this.format()
     const result = await this.store.operations.send(new PutCompareExchangeValueOperation<T>(formatted, value, 0))
+
     return result && result.successful
   }
 
   get = async (): Promise<T> => {
     const formatted = this.format()
     const result = await this.store.operations.send(new GetCompareExchangeValueOperation<T>(formatted))
+
     return result?.value
   }
 }

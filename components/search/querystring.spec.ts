@@ -8,6 +8,7 @@ const tests = (qs: StatefulQuerystring) => {
   // remove
   const elements_before = Object.keys(qs.elements)
   const ftype = qs.get('f:type')
+
   qs.remove(['f:type'])
   expect(qs.contains('f:type')).toBe(false)
 
@@ -30,7 +31,7 @@ const tests = (qs: StatefulQuerystring) => {
   // replace multiple
   qs.replaceMultiple({
     'f:type': '123456',
-    'f:condition': 'test'
+    'f:condition': 'test',
   })
 
   expect(qs.get('f:type')).toBe('123456')
@@ -49,6 +50,7 @@ describe('Querystring tests', () => {
 
   test('Nothing is truncated after removing keys', () => {
     const qs = new StatefulQuerystring('http://farmto.com/api?f:type=1,2&f:condition=new&sortBy=createdAtUTC')
+
     qs.addOrReplace('f:type', '1,2,3')
     qs.remove(['f:type'])
     expect(qs.uri.indexOf('createdAtUTC') > 0).toBe(true)

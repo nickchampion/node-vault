@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from 'openapi-types'
+import type { OpenAPIV3 } from 'openapi-types'
 
 export const id: OpenAPIV3.ParameterObject = {
   name: 'id',
@@ -6,7 +6,7 @@ export const id: OpenAPIV3.ParameterObject = {
   required: true,
   description: 'ID',
   schema: {
-    type: 'string'
+    type: 'string',
   },
-  allowEmptyValue: false
+  allowEmptyValue: false,
 }

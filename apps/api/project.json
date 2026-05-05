@@ -1,7 +1,7 @@
 {
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "name": "@nodevault/platform.modules.logistics.api",
-  "sourceRoot": "modules/logistics/api",
+  "name": "@nodevault/platform.apps.api",
+  "sourceRoot": "apps/api",
   "projectType": "library",
   "targets": {
     "lint": {
@@ -11,7 +11,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "modules/logistics/api/**/*.ts"
+          "apps/api/**/*.ts"
         ]
       }
     }

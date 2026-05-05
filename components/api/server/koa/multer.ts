@@ -1,7 +1,7 @@
 /* eslint-disable prefer-rest-params */
 import originalMulter from 'multer'
 
-const multerOrig = originalMulter.default ? originalMulter.default : originalMulter
+const multerOrig = originalMulter
 
 const multer = (options: any) => {
   const m = multerOrig(options)
@@ -20,7 +20,7 @@ const parseFile = (file: any) => {
     filename: file['originalname'],
     size: file['size'],
     mimetype: file['mimetype'],
-    buffer: file['buffer']
+    buffer: file['buffer'],
   }
 }
 

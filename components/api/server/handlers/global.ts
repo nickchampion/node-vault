@@ -1,8 +1,14 @@
-import { Errors, HectareError } from '@nodevault/platform.components.common'
-import { configuration } from '@nodevault/platform.components.configuration'
-import { Context } from '@nodevault/platform.components.context'
-import { type Context as OpenApiContext, OpenAPIBackend } from 'openapi-backend'
-import { mapValidationErrors } from '../utils.js'
+import type { Context } from '@nodevault/platform.components.context'
+import { AppError } from '@nodevault/platform.components.domain'
+import type { OpenAPIBackend, Context as OpenApiContext } from 'openapi-backend'
+import type { ValidationError } from '@nodevault/platform.components.api.schemas'
+
+const mapValidationErrors = (validation: { errors?: { path?: string, message?: string }[] | null }): ValidationError[] => {
+  return (validation.errors ?? []).map(err => ({
+    path: err.path ?? '',
+    message: err.message ?? '',
+  }))
+}
 
 export const registerGlobalHandlers = (api: OpenAPIBackend) => {
   api.register({
@@ -10,18 +16,20 @@ export const registerGlobalHandlers = (api: OpenAPIBackend) => {
     // security requirements specified in the open api document for the API are not met
     unauthorizedHandler: async (ctx: OpenApiContext, context: Context) => {
       // try to extract the hectare error from the context and use this in the response
-      const e = ctx.security?.jwt?.error ? ctx.security?.jwt?.error : ctx['error'] || null
+      const e = (ctx.security as any)?.jwt?.error ? (ctx.security as any).jwt.error : (ctx as any)['error'] || null
 
       if (e) {
-        const errorCode = e instanceof HectareError ? e : Errors.Custom(e.name, e.message, e.stack)
+        const errorCode = e instanceof AppError ? e : new AppError('internal', e.message, 500, e.stack)
 
         if ((e.code?.name ?? e.name ?? e.code)?.toLowerCase() === 'forbidden') {
-          context.event.response.forbidden(errorCode)
+          context.event.response.forbidden()
+          ;(context.event.response.body as any) = { ...(context.event.response.body as object), errorCode }
         } else {
-          context.event.response.unauthorised(errorCode, configuration.production, context.event.headers)
+          context.event.response.unauthorised()
+          ;(context.event.response.body as any) = { ...(context.event.response.body as object), errorCode }
         }
       } else {
-        context.event.response.unauthorised(Errors.Auth.Unauthorised, configuration.production, context.event.headers)
+        context.event.response.unauthorised()
       }
     },
 
@@ -33,7 +41,7 @@ export const registerGlobalHandlers = (api: OpenAPIBackend) => {
      * @returns
      */
     validationFail: async (ctx: OpenApiContext, context: Context) => {
-      return context.event.response.badRequest(mapValidationErrors(ctx.validation))
+      return context.event.response.badRequest(mapValidationErrors(ctx.validation as any))
     },
 
     /**
@@ -44,7 +52,8 @@ export const registerGlobalHandlers = (api: OpenAPIBackend) => {
      * @returns
      */
     notImplemented: (ctx: OpenApiContext, context: Context) => {
-      const response = ctx.api.mockResponseForOperation(ctx.operation.operationId)
+      const response = ctx.api.mockResponseForOperation(ctx.operation.operationId ?? '')
+
       return context.event.response.ok(response.mock)
     },
 
@@ -54,7 +63,7 @@ export const registerGlobalHandlers = (api: OpenAPIBackend) => {
      * @param context
      * @returns
      */
-    notFound: async (ctx: OpenApiContext, context: Context) => context.event.response.notFound()
+    notFound: async (_ctx: OpenApiContext, context: Context) => context.event.response.notFound(),
 
     // /**
     //  * Validate response schema

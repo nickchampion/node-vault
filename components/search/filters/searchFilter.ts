@@ -1,8 +1,8 @@
 import type { IDocumentQuery } from 'ravendb'
-import { BaseModel } from '@nodevault/platform.components.common'
+import type { BaseModel } from '@nodevault/platform.components.domain'
 
 export interface ISearchFilter {
-  negate: boolean
+  negate: boolean | undefined
   name: string
   terms: string[]
   operator: 'AND' | 'OR'

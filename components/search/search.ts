@@ -1,14 +1,15 @@
-import { Context } from '@nodevault/platform.components.context'
-import { BaseModel, HectareError, collections, Errors } from '@nodevault/platform.components.common'
-import { type IDocumentQuery, FacetBuilder } from 'ravendb'
-import { pipe } from 'rambda'
-import { FacetMap, type RawQuery, SearchContext, SearchResults, type SortOrderType } from './entities.js'
-import { FacetBase, type FacetResultObject } from 'ravendb'
+import type { Context } from '@nodevault/platform.components.context'
+import type { BaseModel } from '@nodevault/platform.components.common'
+import { HectareError, collections, Errors } from '@nodevault/platform.components.common'
+import type { FacetBuilder, type IDocumentQuery, FacetBase, type FacetResultObject } from 'ravendb'
+import { clone, isNumericString, mergeInTo, toObject } from '@nodevault/platform.components.utils'
+import type { FacetMap, type RawQuery, SearchContext, SearchResults, type SortOrderType } from './entities.js'
 import * as url from './url.js'
 import * as map from './map.js'
 import * as filters from './filters/index.js'
 import { execute as search } from './execute.js'
-import { clone, isNumericString, mergeInTo, toObject } from '@nodevault/platform.components.utils'
+
+const pipe = <T>(value: T, ...fns: Array<(input: any) => any>): any => fns.reduce((acc, fn) => fn(acc), value as any)
 
 /**
  * The search component allows us to perform faceted searches for any collection.
@@ -38,7 +39,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
       // apply paging and sort settings to the query
       filters.applySettings,
       // initialise the querystring helper which is used for generating links for the search results
-      url.querystring
+      url.querystring,
     )
 
     const res = await search(sc)
@@ -53,7 +54,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
       // map active filters to the results
       map.mapActiveFacet,
       // map the active filters to the results
-      map.activeFilters
+      map.activeFilters,
     )
 
     return r.results as SearchResults<TResult, TCustom>
@@ -77,7 +78,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
       // apply paging and sort settings to the query
       filters.applySettings,
       // initialise the querystring helper which is used for generating links for the search results
-      url.querystring
+      url.querystring,
     )
 
     return sc.query as IDocumentQuery<T>
@@ -89,18 +90,22 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    * @returns
    */
   withContext(context: Context) {
+    if (!context.session.database) throw new HectareError(Errors.Format(Errors.Platform.SessionNotInitialised))
+
+    const database = context.session.database
+
     this.searchContext.session = context.session
     this.searchContext.docs = !context.event.query.docs || context.event.query.docs === 'true'
     this.searchContext.log = context.log
     this.searchContext.event = context.event
-    this.searchContext.query = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.query = database.query<T>({
+      indexName: this.searchContext.index,
     })
-    this.searchContext.facetQuery = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.facetQuery = database.query<T>({
+      indexName: this.searchContext.index,
     })
-    this.searchContext.facetQueryActive = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.facetQueryActive = database.query<T>({
+      indexName: this.searchContext.index,
     })
     return this
   }
@@ -109,13 +114,15 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
     context: Context,
     customFacetName: string,
     facetBuilder: (facetBuilder: FacetBuilder<BaseModel>) => void,
-    resultMap: (ctx: SearchContext, facetResult: FacetResultObject) => void
+    resultMap: (ctx: SearchContext, facetResult: FacetResultObject) => void,
   ) {
+    if (!context.session.database) throw new HectareError(Errors.Format(Errors.Platform.SessionNotInitialised))
+
     this.searchContext.customFacetName = customFacetName
     this.searchContext.customFacetResultMap = resultMap
     this.searchContext.customFacetBuilder = facetBuilder
     this.searchContext.customFacetQuery = context.session.database.query<T>({
-      indexName: this.searchContext.index
+      indexName: this.searchContext.index,
     })
     return this
   }
@@ -136,22 +143,28 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    * @returns
    */
   withIndex(context: Context, index: string) {
+    if (!context.session.database) throw new HectareError(Errors.Format(Errors.Platform.SessionNotInitialised))
+
+    const database = context.session.database
+
     this.searchContext.index = index
 
-    this.searchContext.query = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.query = database.query<T>({
+      indexName: this.searchContext.index,
     })
-    this.searchContext.facetQuery = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.facetQuery = database.query<T>({
+      indexName: this.searchContext.index,
     })
-    this.searchContext.facetQueryActive = context.session.database.query<T>({
-      indexName: this.searchContext.index
+    this.searchContext.facetQueryActive = database.query<T>({
+      indexName: this.searchContext.index,
     })
+
     if (this.searchContext.customFacetQuery) {
-      this.searchContext.customFacetQuery = context.session.database.query<T>({
-        indexName: this.searchContext.index
+      this.searchContext.customFacetQuery = database.query<T>({
+        indexName: this.searchContext.index,
       })
     }
+
     return this
   }
 
@@ -182,6 +195,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
     if (cond()) {
       action(this)
     }
+
     return this
   }
 
@@ -201,6 +215,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
     if (this.searchContext.customFacetQuery && !excludeFromCustomQuery) {
       this.searchContext.customFacetQuery = fn(this.searchContext.customFacetQuery)
     }
+
     return this
   }
 
@@ -242,6 +257,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    */
   withCustomFacet(facet: FacetMap) {
     if (facet) this.searchContext.customFacets.push(facet)
+
     return this
   }
 
@@ -262,7 +278,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    * @returns
    */
   withFacetMaps(facetMaps: FacetMap[]) {
-    this.searchContext.facetMaps = toObject(facetMaps, m => m.name, true)
+    this.searchContext.facetMaps = toObject(facetMaps, m => m.name, false)
     return this
   }
 
@@ -272,7 +288,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    * @returns
    */
   withResultsMap(map: (model: T) => TResult | TResult[]) {
-    this.searchContext.resultsMap = map
+    this.searchContext.resultsMap = map as (model: BaseModel) => any
     return this
   }
 
@@ -282,7 +298,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
    * @returns
    */
   withResultsMapAll(map: (model: T[]) => Promise<TResult[]> | TResult[]) {
-    this.searchContext.resultsMapAll = map
+    this.searchContext.resultsMapAll = map as (model: BaseModel[]) => Promise<any[]> | any[]
     return this
   }
 
@@ -292,7 +308,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
   }
 
   withFreeTextQuery(query: string) {
-    if (query && query.length) this.searchContext.search = query
+    if (query && query.length > 0) this.searchContext.search = query
 
     return this
   }
@@ -306,6 +322,7 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
 
     const mapArray = (t: string | string[]) => {
       const terms = Array.isArray(t) ? t : [t]
+
       if (terms.some(t => !isNumericString(t))) {
         return terms.map(x => `'${x}'`).join(',')
       } else {
@@ -313,20 +330,23 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
       }
     }
 
+    const settingsFilters = this.searchContext.settings.filters ?? {}
     const whereFilters = this.searchContext.facetFilters
       .map(f => `${f.name} in (${mapArray(f.terms)})`)
       .concat(
-        Object.keys(this.searchContext.settings.filters).map(k => `${k} in (${mapArray(this.searchContext.settings.filters[k])})`)
+        Object.keys(settingsFilters).map(k => `${k} in (${mapArray(settingsFilters[k])})`),
       )
 
     let sort = `order by createdAtUTC ${this.searchContext.settings.sortDesc ? 'desc' : ''}`
 
     if (this.searchContext.settings.sortBy?.length) {
-      sort = `order by ${this.searchContext.settings.sortBy.map(sort => {
-        const as = this.searchContext.sortOrderTypeMap[sort.fieldName]
-          ? `as ${this.searchContext.sortOrderTypeMap[sort.fieldName]}`
+      sort = `order by ${this.searchContext.settings.sortBy.map((sort) => {
+        const fieldName = sort.fieldName ?? ''
+        const as = this.searchContext.sortOrderTypeMap[fieldName]
+          ? `as ${this.searchContext.sortOrderTypeMap[fieldName]}`
           : ''
-        return `${sort.fieldName} ${as} ${sort.sortDesc ? 'desc' : ''}`
+
+        return `${fieldName} ${as} ${sort.sortDesc ? 'desc' : ''}`
       })}`
     }
 
@@ -336,12 +356,12 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
           this.searchContext.facetFilters,
           f => f.name,
           false,
-          f => f.terms
+          f => f.terms,
         ),
-        this.searchContext.settings.filters
+        settingsFilters,
       ),
       where: whereFilters.join(' and '),
-      sort
+      sort,
     }
 
     return rawQuery
@@ -350,6 +370,6 @@ export class Search<T extends BaseModel, TResult, TCustom = any> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   validate(facets: boolean) {
     if (!this.searchContext.event) throw new HectareError(Errors.Format(Errors.Platform.SearchFieldNotSet, 'event'))
-    //if (!this.searchContext.facets && facets) throw new HectareError(Errors.Format(Errors.Platform.SearchFieldNotSet, 'facets'))
+    // if (!this.searchContext.facets && facets) throw new HectareError(Errors.Format(Errors.Platform.SearchFieldNotSet, 'facets'))
   }
 }
