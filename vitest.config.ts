@@ -15,6 +15,9 @@ const alias = {
   '@nodevault/platform.components.domain': path.resolve('./components/domain/index.ts'),
   '@nodevault/platform.components.context': path.resolve('./components/context/index.ts'),
   '@nodevault/platform.components.utils': path.resolve('./components/utils/index.ts'),
+  '@nodevault/platform.components.utils.server': path.resolve('./components/utils-server/index.ts'),
+  '@nodevault/platform.integrations.resend': path.resolve('./integrations/resend/index.ts'),
+  '@nodevault/platform.integrations.cloudflare': path.resolve('./integrations/cloudflare/index.ts'),
 }
 
 export default defineConfig({

@@ -14,7 +14,6 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const navLinks: NavigationMenuItem[] = [
-  { label: 'Home', to: '/' },
   {
     label: 'GrapheneOS',
     to: '/grapheneos',
@@ -60,5 +59,6 @@ const navLinks: NavigationMenuItem[] = [
       },
     ],
   },
+  { label: 'Contact', to: '/company/contact' },
 ]
 </script>

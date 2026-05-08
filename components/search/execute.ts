@@ -1,5 +1,6 @@
 import type { QueryStatistics, Lazy, Facet, FacetResultObject } from 'ravendb'
-import { getValueByPath, fakeLazy, isPromise } from '@nodevault/platform.components.utils'
+import { getValueByPath } from '@nodevault/platform.components.utils'
+import { fakeLazy, isPromise } from '@nodevault/platform.components.utils.server'
 import type { BaseModel } from '@nodevault/platform.components.domain'
 import type { SearchContext } from './entities.js'
 

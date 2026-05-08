@@ -9,6 +9,18 @@ export type ServerConfiguration = {
   version: string
   ravendb: RavenDB
   cloudflare: Cloudflare
+  ntfy: Ntfy
+  resend: {
+    apiKey: string
+    from: string
+  }
+}
+
+export type Ntfy = {
+  host: string
+  username: string
+  password: string
+  topics: Record<string, string>
 }
 
 export type BasicAuth = {
@@ -22,8 +34,6 @@ export type RavenDB = {
   endpoints: string[]
   certificate: string
   database: string
-  databases?: Record<string, string>
-  testDatabaseName?: string
 }
 
 export type Cloudflare = {
@@ -77,5 +87,25 @@ export const server = {
       prod: 'C5hRCGX0iUDF6fbZLUCcCZlEgPmyjM+VSJXwe8PsdYEHF2/leyn+6RgfE7ht1SMtfY2uW83/tXj2rdfNmMSK',
       encrypted: true,
     },
+  },
+  ntfy: {
+    host: 'https://nfty.nickchampion.me',
+    topics: {
+      phone: 'bkw1Nzhkcy',
+    },
+    username: 'umbrel',
+    password: {
+      default: 'RsFgDmHCgM67znuRIXEAH2Xu+2tclzKF',
+      prod: 'B1iOqWFd496erujRFheZXxOoEbzOHkBQ',
+      encrypted: true,
+    },
+  },
+  resend: {
+    apiKey: {
+      default: 'sz73qZnpYpqSEBMh2k7C7ejft5SGXRSP6QVaytFe2BbKy6+sp/e3hqtzPqRdKQ==',
+      prod: 'SiDNd6gFBH0HP4T/XRDYyrFyC5olQWIH3n1rnvMprd9b2ZRrr7SdMMm8REvB0Q==',
+      encrypted: true,
+    },
+    from: 'NodeVault <hello@nodevault.cloud>',
   },
 }

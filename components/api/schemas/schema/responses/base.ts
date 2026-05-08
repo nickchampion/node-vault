@@ -1,5 +1,5 @@
 import type { OpenAPIV3 } from 'openapi-types'
-import { StandardResponse } from '../common/shared.js'
+import { StandardResponse } from '../common/schema.js'
 
 export const Unauthorised: OpenAPIV3.ResponseObject = {
   description: 'Unauthorised',

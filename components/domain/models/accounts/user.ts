@@ -1,17 +1,17 @@
+import type { Phone } from '../../types/index.js'
 import { BaseModel } from '../base.js'
-import type { Phone } from '../common.js'
 
 export type UserStatus = 'active' | 'deleted'
-export type UserRole = 'user' | 'admin'
+export type UserRole = 'guest' | 'user' | 'admin'
 
 export class User extends BaseModel {
-  firstName: string | undefined
-  lastName: string | undefined
-  countryISO: string | undefined
-  email: string | undefined
-  phone: Phone | undefined
-  accountId: string | undefined
-  status: UserStatus | undefined
+  firstName!: string
+  lastName!: string
+  countryISO!: string
+  email!: string
+  phone: Phone | null = null
+  accountId!: string
+  status!: UserStatus
   roles: UserRole[] = []
 
   constructor(fields?: Partial<User>) {

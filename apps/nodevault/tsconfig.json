@@ -6,7 +6,10 @@
     "nuxt.d.ts",
     "app/**/*.ts",
     "app/**/*.vue",
-    "nuxt.config.ts"
+    "server/**/*.ts",
+    "server/**/*.vue",
+    "nuxt.config.ts",
+    "../../vue-shim.d.ts"
   ],
   "exclude": [
     "node_modules",

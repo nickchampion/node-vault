@@ -3,8 +3,8 @@ import { BaseModel } from '../base.js'
 export type AccountStatus = 'active' | 'deleted'
 
 export class Account extends BaseModel {
-  status: AccountStatus | undefined
-  name: string | undefined
+  status!: AccountStatus
+  name!: string
 
   constructor(fields?: Partial<Account>) {
     super(Account.index, 'accounts')

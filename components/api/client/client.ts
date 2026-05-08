@@ -112,9 +112,8 @@ export class ApiClient {
       'Content-Type': 'application/json',
       'x-device-info': this.options.device,
       'x-version': this.options.version,
-      ...(tokens?.id && {
+      ...(tokens?.access && {
         authorization: `Bearer ${tokens.access}`,
-        'x-authorization-id': tokens.id,
       }),
     }
   }

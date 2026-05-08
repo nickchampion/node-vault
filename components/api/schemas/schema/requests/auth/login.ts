@@ -1,22 +1,19 @@
 import type { OpenAPIV3 } from 'openapi-types'
 
-export const LoginSchema: OpenAPIV3.SchemaObject = {
+export const LoginRequestSchema: OpenAPIV3.SchemaObject = {
   type: 'object',
   additionalProperties: false,
-  required: ['emailOrPhoneNumber'],
+  required: ['email'],
   nullable: false,
   properties: {
-    emailOrPhoneNumber: { type: 'string' },
+    email: { type: 'string', nullable: false },
   },
 }
 
 export const LoginRequest: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject = {
   content: {
     'application/json': {
-      schema: {
-        type: 'array',
-        items: LoginSchema,
-      },
+      schema: LoginRequestSchema,
     },
   },
 }

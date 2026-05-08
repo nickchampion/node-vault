@@ -18,6 +18,8 @@ export const composeOpenApiDocument = (): OpenAPIV3.Document => {
     security: [],
     tags: [
       { name: 'Account', description: 'Account and user management' },
+      { name: 'Comms', description: 'Contact and communication' },
+      { name: 'Auth', description: 'Authorisation & Registration' },
     ],
     components: {
       responses: schema.responses.ApiResponses,
@@ -29,18 +31,23 @@ export const composeOpenApiDocument = (): OpenAPIV3.Document => {
         },
       },
       schemas: {
+        // common
         ValidationErrorSchema: schema.common.ValidationError,
         StandardResponseSchema: schema.common.StandardResponse,
-        AddressSchema: schema.common.Address,
+        // account
         UserSchema: schema.responses.account.UserSchema,
         AccountSchema: schema.responses.account.AccountSchema,
         UserSearchResultsSchema: schema.common.SearchResults(schema.responses.account.UserSchema),
-        LoginRequestSchema: schema.requests.auth.LoginSchema,
-        LoginResponseSchema: schema.responses.auth.LoginResponseSchema,
+        // auth
+        VerifyLoginSchema: schema.responses.auth.VerifyLoginSchema,
+        RegisterRequestSchema: schema.requests.auth.RegisterRequestSchema,
+        // comms
+        ContactRequestSchema: schema.requests.comms.ContactRequestSchema,
       },
     },
     paths: {
       ...paths.auth,
+      ...paths.comms,
     },
   }
 

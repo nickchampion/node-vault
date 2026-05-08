@@ -2,8 +2,8 @@
 import { readdirSync, existsSync } from 'node:fs'
 import path from 'node:path'
 import type { DocumentStore } from 'ravendb'
-import { createMD5FileHash, sleep } from '@nodevault/platform.components.utils'
 import { GeneralError } from '@nodevault/platform.components.domain'
+import { utils } from './utils'
 import { createDocumentStore } from './index.js'
 
 const logOk = (msg: string) => console.log(`  \u001B[32m✔\u001B[0m ${msg}`)
@@ -122,7 +122,7 @@ export const saveWithRetries = async (
       if (i >= 3) {
         throw new GeneralError('Failed to save migration registry')
       } else {
-        await sleep(1000)
+        await utils.sleep(1000)
       }
     }
   }
@@ -215,7 +215,7 @@ const executeTasks = async (
 
     for (const migration of migrations) {
       // generate a hash of the file so we can see if its changed and needs updating
-      const hash = createMD5FileHash(migration.path)
+      const hash = utils.createMD5FileHash(migration.path)
 
       // load the task from the regsitry or create if its not there
       const task = registry.tasks[migration.name] || createTask(migration.name)

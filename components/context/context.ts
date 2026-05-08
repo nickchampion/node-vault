@@ -1,8 +1,9 @@
 import type { IDocumentStore } from 'ravendb'
 import { Session } from '@nodevault/platform.components.ravendb'
-import type { AppError, User } from '@nodevault/platform.components.domain'
+import type { AppError } from '@nodevault/platform.components.domain'
 import { InboundEvent } from './types/event.js'
 import { Log, type LogLevel } from './log.js'
+import type { AuthInfo } from './types/auth.js'
 
 type ContextEvent = (context: Context) => Promise<void> | void
 
@@ -11,7 +12,7 @@ type ContextEvent = (context: Context) => Promise<void> | void
  * if its needed by the executing code, this allows Lambdas to manage the connection
  * outside the function code to prevent a connection per function execution
  */
-export type RavenDBConnection = () => IDocumentStore | null
+export type RavenDBConnection = () => IDocumentStore
 
 export interface ContextEvents {
   error: ContextEvent
@@ -26,10 +27,10 @@ export interface ContextEvents {
  * entities that provide functionality that cuts across all handlers
  */
 export class Context {
-  public store: IDocumentStore | null
+  public store: IDocumentStore
   public session: Session
   public event: InboundEvent
-  public user: User | undefined
+  public user: AuthInfo | undefined
   public authorised: boolean = false
   public props: Record<string, any> = {}
   public ravendb: RavenDBConnection
@@ -51,7 +52,7 @@ export class Context {
     return this
   }
 
-  public setUser(user: User) {
+  public setUser(user: AuthInfo) {
     this.user = user
   }
 

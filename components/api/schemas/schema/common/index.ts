@@ -1,2 +1,2 @@
 export * from './search.js'
-export * from './shared.js'
+export * from './schema.js'

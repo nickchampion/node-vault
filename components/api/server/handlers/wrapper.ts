@@ -1,6 +1,5 @@
 import type { Context as OpenAPIContext } from 'openapi-backend'
-import type { Context, ApiHandler } from '@nodevault/platform.components.context'
-import { User } from '@nodevault/platform.components.domain'
+import { type Context, type ApiHandler, AuthInfo } from '@nodevault/platform.components.context'
 import { authoriseUser } from './security.js'
 
 /**
@@ -20,10 +19,10 @@ const wrap = (handler: ApiHandler) => async (c: OpenAPIContext, context: Context
   context.event.params = c.request.params
 
   // set up the context.user which has been constructed in the `security` handler
-  context.user = (c.security.jwt as User) ?? null
+  context.user = (c.security.jwt as AuthInfo) ?? null
 
   if (!context.user) {
-    context.user = (await authoriseUser(c, false)) ?? new User()
+    context.user = (await authoriseUser(c)) ?? AuthInfo.guest()
   }
 
   context.authorised = c.security.authorized

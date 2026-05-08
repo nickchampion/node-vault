@@ -1,52 +1,44 @@
 <template>
-  <UDashboardGroup>
-    <UDashboardSidebar
-      collapsible
-      resizable>
-      <template #header>
-        <NuxtLink
-          to="/"
-          class="flex items-center gap-2.5 px-1 min-w-0">
-          <AppLogo class="size-7 shrink-0" />
+  <div class="fixed inset-0 flex flex-col overflow-hidden">
+    <header class="h-(--ui-header-height) shrink-0 flex items-center justify-between px-4 sm:px-6 border-b border-default bg-background z-50">
+      <NuxtLink
+        to="/"
+        class="flex items-center gap-2.5">
+        <AppLogo class="size-7 shrink-0" />
+        <span class="font-semibold text-sm tracking-tight">NodeVault</span>
+      </NuxtLink>
 
-          <span class="font-semibold text-base truncate">NodeVault</span>
-        </NuxtLink>
-      </template>
+      <div class="flex items-center gap-2">
+        <p class="text-sm text-muted hidden sm:block">
+          Admin
+        </p>
 
-      <UNavigationMenu
-        orientation="vertical"
-        :items="navLinks"
-        class="px-2 data-[collapsed=true]:px-0" />
+        <UAvatar
+          icon="i-lucide-user"
+          size="sm" />
 
-      <template #footer>
-        <div class="flex items-center gap-3 px-1 min-w-0">
-          <UAvatar
-            icon="i-lucide-user"
-            size="sm"
-            class="shrink-0" />
+        <UButton
+          icon="i-lucide-log-out"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          to="/" />
+      </div>
+    </header>
 
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">
-              Admin
-            </p>
+    <div class="flex flex-1 overflow-hidden">
+      <aside class="hidden lg:flex flex-col w-56 shrink-0 border-r border-default overflow-y-auto">
+        <UNavigationMenu
+          orientation="vertical"
+          :items="navLinks"
+          class="px-2 py-2 flex-1" />
+      </aside>
 
-            <p class="text-xs text-muted truncate">
-              admin@nodevault.io
-            </p>
-          </div>
-
-          <UButton
-            icon="i-lucide-log-out"
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            class="shrink-0" />
-        </div>
-      </template>
-    </UDashboardSidebar>
-
-    <slot />
-  </UDashboardGroup>
+      <div class="flex-1 overflow-y-auto">
+        <slot />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -1,12 +1,12 @@
+import type { AuthInfo } from '@nodevault/platform.components.context'
 import {
   InboundEvent,
 } from '@nodevault/platform.components.context'
 import type { OpenAPIBackend, Context as OpenApiContext } from 'openapi-backend'
-import type { OpenAPIV3 } from 'openapi-types'
-import type { User } from '@nodevault/platform.components.domain'
 import { AuthError } from '@nodevault/platform.components.domain'
-import { decrypt } from '@nodevault/platform.components.utils'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { createAuthInfoFromToken } from '@nodevault/platform.components.utils.server'
+import { isExpired } from '@nodevault/platform.components.utils'
+import { toDate } from 'date-fns'
 
 /**
  * Check to see if the authenticated user has access to the given endpoint
@@ -14,31 +14,26 @@ import { serverConfiguration } from '@nodevault/platform.components.configuratio
  * @param userPermissions Array of permissions the user has
  * @returns true if user has access, otherwise an error
  */
-export const authoriseUser = async (ctx: OpenApiContext, authRequest: boolean): Promise<User | null> => {
-  const tokens = InboundEvent.getAuthTokens(ctx.request.headers)
+export const authoriseUser = async (ctx: OpenApiContext): Promise<AuthInfo | null> => {
+  const token = InboundEvent.getAuthToken(ctx.request.headers)
+  const endpointRoles = ctx.operation.security?.find(s => Object.prototype.hasOwnProperty.call(s, 'jwt'))?.jwt ?? []
 
-  if ((!tokens || !tokens.access) && authRequest) {
+  if (!token && endpointRoles.length > 0) {
     throw new AuthError()
   }
 
-  const decryptedAuthToken = decrypt(tokens.access!, serverConfiguration.environment.key, serverConfiguration.environment.salt)
+  const authInfo = createAuthInfoFromToken(token)
 
-  if (!decryptedAuthToken) throw new AuthError()
-
-  const user = JSON.parse(decryptedAuthToken) as User
-
-  if (user) {
-    // verify the user has access to this endpoint
-    if (authRequest) {
-      authoriseRequest(ctx.operation.security ?? [], user.roles)
-    }
-
-    return user
+  if (endpointRoles.length > 0 && isExpired(toDate(authInfo.expiresAtUTC))) {
+    throw new AuthError()
   }
 
-  if (authRequest) throw new AuthError()
+  // verify the user has access to this endpoint if the endpoint has roles assigned
+  if (endpointRoles.length > 0) {
+    authoriseRequest(endpointRoles, authInfo!.roles)
+  }
 
-  return null
+  return authInfo
 }
 
 /**
@@ -50,7 +45,7 @@ export const authoriseUser = async (ctx: OpenApiContext, authRequest: boolean): 
  */
 export const registerSecurityHandler = (api: OpenAPIBackend) => {
   api.registerSecurityHandler('jwt', async (ctx: OpenApiContext) => {
-    return await authoriseUser(ctx, true)
+    return await authoriseUser(ctx)
   })
 
   return api
@@ -62,10 +57,7 @@ export const registerSecurityHandler = (api: OpenAPIBackend) => {
  * @param userPermissions Array of permissions the user has
  * @returns true if user has access, otherwise an error
  */
-export const authoriseRequest = (security: OpenAPIV3.SecurityRequirementObject[], roles: string[]): boolean => {
-  // extract the permissions set on the security for this endpoint
-  const endpointRoles = security.find(s => Object.prototype.hasOwnProperty.call(s, 'jwt'))?.jwt
-
+export const authoriseRequest = (endpointRoles: string[], roles: string[]): boolean => {
   // if no permissions are set we just need a valid token
   if (!endpointRoles || endpointRoles.length === 0) return true
 

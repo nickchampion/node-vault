@@ -1,4 +1,4 @@
-import { createMD5Hash } from '@nodevault/platform.components.utils'
+import { createMD5Hash } from '@nodevault/platform.components.utils.server'
 import type { StandardResponse, ValidationError } from '@nodevault/platform.components.api.schemas'
 import type { AppError } from '@nodevault/platform.components.domain'
 import type { FileContent } from '../../api/server/types/file.js'

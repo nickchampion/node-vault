@@ -1,5 +1,5 @@
 {
-  "include": ["apps/**/*.ts", "apps/**/*.vue", "components/**/*.ts", "*.d.ts", ".nodevault/build/schemas.ts"],
+  "include": ["apps/**/*.ts", "apps/**/*.vue", "components/**/*.ts", "integrations/**/*.ts", "*.d.ts", ".nodevault/build/schemas.ts"],
   "exclude": ["node_modules", "**/node_modules/*", ".nuxt", ".output", "**/.output/*", "dist", "**/.nuxt/*"],
   "compileOnSave": true,
   "typeRoots": ["./node_modules/@types"],
@@ -42,7 +42,10 @@
       "@nodevault/platform.components.search": ["./components/search/index.ts"],
       "@nodevault/platform.components.domain": ["./components/domain/index.ts"],
       "@nodevault/platform.components.context": ["./components/context/index.ts"],
-      "@nodevault/platform.components.utils": ["./components/utils/index.ts"]
+      "@nodevault/platform.components.utils": ["./components/utils/index.ts"],
+      "@nodevault/platform.components.utils.server": ["./components/utils-server/index.ts"],
+      "@nodevault/platform.integrations.resend": ["./integrations/resend/index.ts"],
+      "@nodevault/platform.integrations.cloudflare": ["./integrations/cloudflare/index.ts"]
     }
   }
 }

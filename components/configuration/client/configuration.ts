@@ -3,10 +3,10 @@ import type { Environment } from '@nodevault/platform.components.configuration.c
 export interface ClientConfiguration {
   version: string
   environment: Environment
-  app: string
   platform: {
     api: string
     apiProxy: string
+    app: string
     assets: string
   }
   contact: {
@@ -26,6 +26,10 @@ export const clientConfiguration: any = {
     api: {
       default: 'http://api.nodevault.local:9002',
       prod: 'https://api.nodevault.cloud',
+    },
+    app: {
+      default: 'http://www.nodevault.local:9001',
+      prod: 'https://www.nodevault.cloud',
     },
   },
   contact: {

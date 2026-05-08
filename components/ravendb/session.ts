@@ -23,25 +23,21 @@ export class Session {
 
   // used by get requests to indicate we want to save the session, usually we dont commit the session on a get
   public commitOnGet: boolean
-  public database: IDocumentSession | null
+  public database!: IDocumentSession
   public veto: boolean
   public commited: boolean
-  public documentStore: IDocumentStore | null
+  public documentStore: IDocumentStore
 
-  constructor(store: IDocumentStore | null) {
+  constructor(store: IDocumentStore) {
     this.documentStore = store
-    this.database = store ? store.openSession() : null
+    this.database = store.openSession()
     this.veto = false
     this.commitOnGet = false
     this.commited = false
   }
 
   dispose() {
-    if (this.database) {
-      this.database.dispose()
-      this.database = null
-    }
-
+    this.database.dispose()
     this.eventListeners = {}
     this.errorListeners = []
     this.veto = false
@@ -60,7 +56,7 @@ export class Session {
 
   reset() {
     this.dispose()
-    this.database = this.documentStore?.openSession() ?? null
+    this.database = this.documentStore.openSession()
   }
 
   /**
@@ -90,7 +86,7 @@ export class Session {
    * @param arg
    * @returns
    */
-  private async emit<T extends keyof SessionEvents>(event: T, arg: Session | IDocumentStore | null): Promise<void> {
+  private async emit<T extends keyof SessionEvents>(event: T, arg: Session | IDocumentStore): Promise<void> {
     const events = this.eventListeners[event]
 
     if (!events) return

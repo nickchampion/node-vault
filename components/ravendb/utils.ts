@@ -1,5 +1,6 @@
+import * as crypto from 'node:crypto'
+import fs from 'node:fs'
 import { type Page, type QuerySettings, type BaseModel, collections, GeneralError } from '@nodevault/platform.components.domain'
-import { randomAlphaNumeric } from '@nodevault/platform.components.utils'
 import {
   type FacetBase,
   type IndexQuery,
@@ -12,10 +13,26 @@ import {
 } from 'ravendb'
 
 class Utils {
-  INT_MAX_VALUE = 2147483647
+  INT_MAX_VALUE = 2147483647 as const
+  ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' as const
 
   async sleep(milliseconds: number): Promise<void> {
     new Promise(resolve => setTimeout(resolve, milliseconds))
+  }
+
+  randomAlphaNumeric(length: number, prefix: string = '') {
+    const bytes = crypto.randomBytes(length)
+    const chars = []
+
+    for (const byte of bytes) {
+      chars.push(this.ALPHABET[byte % this.ALPHABET.length])
+    }
+
+    return prefix ? prefix + chars.join('') : chars.join('')
+  }
+
+  createMD5FileHash(path: string) {
+    return crypto.createHash('sha256').update(fs.readFileSync(path)).digest('base64')
   }
 
   buildFacet<T>(builder: (facetBuilder: FacetBuilder<T>) => void): FacetBase {
@@ -110,7 +127,7 @@ class Utils {
   ): Promise<void> {
     const index = new model().getIndexName()
     // used to allow us to go through all docs patching them as we process them and querying by the patch key
-    const uniquePatchKey = randomAlphaNumeric(10)
+    const uniquePatchKey = this.randomAlphaNumeric(10)
 
     while (true) {
       const session = store.openSession()

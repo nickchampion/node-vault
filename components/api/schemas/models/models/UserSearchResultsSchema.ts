@@ -13,7 +13,8 @@ export type UserSearchResultsSchema = {
 		phone: {
 			countryCode: string;
 			number: string;
-		};
+		} | null;
+		roles: Array<'guest' | 'user' | 'admin'>;
 	}>;
 	custom?: any;
 	/**

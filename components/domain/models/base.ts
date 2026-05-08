@@ -2,10 +2,10 @@ export abstract class BaseModel {
   #index: string // # hash identifier ensures these fields dont get persisted to the database
   #collection: string
 
-  public id: string | undefined
-  public patch: string | undefined
-  public createdAtUTC: string | undefined
-  public updatedAtUTC: string | undefined
+  public id!: string
+  public patch: string | null = null
+  public createdAtUTC!: string
+  public updatedAtUTC!: string
 
   constructor(indexName: string, collectionName: string) {
     this.#index = indexName

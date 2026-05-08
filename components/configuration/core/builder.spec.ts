@@ -1,4 +1,4 @@
-import { base64Decode, base64Encode, encrypt, decrypt } from '@nodevault/platform.components.utils'
+import { base64Decode, base64Encode, encrypt, decrypt } from '@nodevault/platform.components.utils.server'
 
 describe.skip('Encrypt value for configuration', () => {
   it('Encrypt', () => {

@@ -50,7 +50,6 @@ export interface LocationHeaders {
 export interface AuthTokens {
   access: string | null
   refresh: string | null
-  id: string | null
   expiresIn?: number | null
 }
 

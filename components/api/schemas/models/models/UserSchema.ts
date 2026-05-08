@@ -12,6 +12,7 @@ export type UserSchema = {
 	phone: {
 		countryCode: string;
 		number: string;
-	};
+	} | null;
+	roles: Array<'guest' | 'user' | 'admin'>;
 };
 

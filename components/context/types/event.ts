@@ -78,28 +78,22 @@ export class InboundEvent {
     return settings
   }
 
-  public getAuthTokens(): AuthTokens {
-    return InboundEvent.getAuthTokens(this.headers)
+  public getAuthToken(): string | null {
+    return InboundEvent.getAuthToken(this.headers)
   }
 
   public setAuthTokens(tokens: AuthTokens): void {
     this.headers['authorization'] = `Bearer ${tokens.access}`
-    this.headers['x-authorization-refresh'] = `Bearer ${tokens.refresh}`
   }
 
-  static getAuthTokens(headers: Record<string, string | string[]>): AuthTokens {
+  static getAuthToken(headers: Record<string, string | string[]>): string | null {
     const auth = headers['authorization'] || headers['Authorization']
-    const refresh = headers['x-authorization-refresh']
 
     const handleNull = (header: string) => {
       if (header && header.trim().startsWith('null')) return null
       else return header
     }
 
-    return {
-      access: auth ? handleNull(auth.toString().replace('Bearer ', '')) : null,
-      refresh: refresh ? handleNull(refresh.toString().replace('Bearer ', '')) : null,
-      expiresIn: 50000,
-    }
+    return auth ? handleNull(auth.toString().replace('Bearer ', '')) : null
   }
 }

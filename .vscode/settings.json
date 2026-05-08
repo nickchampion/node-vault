@@ -33,7 +33,7 @@
     "*.tsx": "$(capture).ts",
     "dockerfile": ".dockerignore, dockerfile*",
     "project.json": "sentry.client.config.ts,playwright.config.ts,version.json,nuxt.d.ts, nuxt.config.ts, vitest.config.ts, vite.config.ts, prettier*, tsconfig.*, .prettier*, eslint.*, .eslint.*, next.config.mjs, index.d.ts, capacitor.config.ts, pnpm-lock.yaml, Gemfile, Gemfile.lock",
-    "package.json": "CLAUDE.md,components.d.ts, version.json, wrangler.toml, amplify.yml, .env, project.json, nx.json, readme.mdx, overrides.json, vitest.config.ts, .nvmrc, .editorconfig, .gitignore, eslint*, .npm*, .pnpm*, .prettier*, .vscode*, package-lock.json, pnpm*, prettier*, tsconfig.*",
+    "package.json": "vue-shim.d.ts,CLAUDE.md,components.d.ts, version.json, wrangler.toml, amplify.yml, .env, project.json, nx.json, readme.mdx, overrides.json, vitest.config.ts, .nvmrc, .editorconfig, .gitignore, eslint*, .npm*, .pnpm*, .prettier*, .vscode*, package-lock.json, pnpm*, prettier*, tsconfig.*",
     "readme.md": "authors, backers.md, changelog*.md, code_of_conduct.md, readme*, security.md, sponsors.md"
   },
   "search.exclude": {
