@@ -1,8 +1,8 @@
 import type { AsyncDataOptions, AsyncData, NuxtError } from 'nuxt/app'
 import type { UseAsyncStateOptions } from '@vueuse/core'
-import type { ApiResponse } from '@nodevault/platform.components.api.client'
+import type { ApiResponse } from '@nodevault/platform.components.nodevault.client'
 import { simpleHash, serializeValue } from '@nodevault/platform.components.utils'
-import type { StandardResponse } from '@nodevault/platform.components.api.schemas'
+import type { openapi } from '@nodevault/platform.components.domain'
 
 export type AsyncDataHandler<T, TParams = undefined> = TParams extends undefined
   ? () => Promise<ApiResponse<T>>
@@ -10,14 +10,14 @@ export type AsyncDataHandler<T, TParams = undefined> = TParams extends undefined
 
 export type AsyncDataOptionsExtras<T> = {
   onSuccess?: (response: ApiResponse<T>) => void | Promise<void>
-  onError?: (error: StandardResponse) => void | Promise<void>
+  onError?: (error: openapi.models.StandardResponseSchema) => void | Promise<void>
   cacheKey?: string | (() => string)
   cacheTtlSeconds?: number
 }
 
 export type AsyncApiDataOptions<T> = AsyncDataOptions<T> & AsyncDataOptionsExtras<T>
 
-export type AsyncApiDataResponse<T> = AsyncData<T, NuxtError<StandardResponse>>
+export type AsyncApiDataResponse<T> = AsyncData<T, NuxtError<openapi.models.StandardResponseSchema>>
 
 export function useAsyncApiState<T>(action: () => Promise<ApiResponse<T>>, options: UseAsyncStateOptions<true, ApiResponse<T>> | undefined = {}) {
   const { state, execute, isLoading } = useAsyncState<ApiResponse<T>>(
@@ -68,7 +68,7 @@ export function useAsyncApiData<T, TParams = undefined>(
         await options.onError(response.error)
       }
 
-      throw createError<StandardResponse>({
+      throw createError<openapi.models.StandardResponseSchema>({
         statusCode: response.httpStatus,
         statusMessage: response.error.message ?? 'An unknown error has occurred',
         data: response.error,
@@ -80,7 +80,7 @@ export function useAsyncApiData<T, TParams = undefined>(
     }
 
     return response.data as T
-  }, options as any) as any as AsyncData<T, NuxtError<StandardResponse>>
+  }, options as any) as any as AsyncData<T, NuxtError<openapi.models.StandardResponseSchema>>
 
   if (!import.meta.client) return result
 

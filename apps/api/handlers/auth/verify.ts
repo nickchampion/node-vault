@@ -1,10 +1,10 @@
 import { AuthInfo, type ApiHandler } from '@nodevault/platform.components.context'
-import type { Response } from '@nodevault/platform.components.api.server'
 import { base64Decode, createAuthTokenForUser, decrypt } from '@nodevault/platform.components.utils.server'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
-import type { Account } from '@nodevault/platform.components.domain'
-import { AppError, LoginToken, User } from '@nodevault/platform.components.domain'
-import type { VerifyLoginSchema } from '@nodevault/platform.components.api.schemas'
+import type { Account } from '@nodevault/platform.components.nodevault.server'
+import { serverConfiguration, LoginToken, User } from '@nodevault/platform.components.nodevault.server'
+import { AppError } from '@nodevault/platform.components.domain'
+import type { Response } from '@nodevault/platform.components.api'
+import type { VerifyLoginSchema } from '@nodevault/platform.components.nodevault.openapi'
 
 export const authVerify: ApiHandler = async (context): Promise<Response> => {
   const { code } = context.event.payload
@@ -33,7 +33,11 @@ export const authVerify: ApiHandler = async (context): Promise<Response> => {
     }
 
     const account = await context.session.get<Account>(user.accountId)
-    const authInfo = new AuthInfo(user, account)
+    const authInfo = new AuthInfo({
+      ...user,
+      accountName: account.name,
+      accountId: account.id,
+    })
     const authTokens = createAuthTokenForUser(authInfo)
     const verifySchema: VerifyLoginSchema = {
       user: user,

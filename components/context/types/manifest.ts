@@ -1,7 +1,7 @@
 import type { ObjectTypeDescriptor } from 'ravendb'
 import type { OpenAPIV3 } from 'openapi-types'
 import type { Context } from '../context.js'
-import type { Response } from './response.js'
+import type { Response } from '../../api/types/response.js'
 
 /**
  * Signature for API handlers

@@ -84,17 +84,19 @@ Email templates are Nuxt pages under `/emails/*` using the `email` layout. The A
 
 | Package alias | Path | Purpose |
 |---------------|------|---------|
-| `@nodevault/platform.components.api.client` | `components/api/client` | HTTP client — `NodeVaultApiClient`, typed request methods |
-| `@nodevault/platform.components.api.server` | `components/api/server` | Koa server, OpenAPI routing, middy middleware |
-| `@nodevault/platform.components.api.schemas` | `components/api/schemas` | OpenAPI document, request/response schemas, generated TS types |
-| `@nodevault/platform.components.configuration.server` | `components/configuration/server` | Server config loaded from `NODEVAULT` env var (base64 JSON) |
-| `@nodevault/platform.components.configuration.client` | `components/configuration/client` | Client runtime config |
+| `@nodevault/platform.components.api` | `components/api` | Koa server, OpenAPI routing, middy middleware, handler types |
+| `@nodevault/platform.components.nodevault.server` | `components/nodevault/server` | Server config, domain models, RavenDB indexes |
+| `@nodevault/platform.components.nodevault.client` | `components/nodevault/client` | Client runtime config, `NodeVaultApiClient`, typed request methods |
+| `@nodevault/platform.components.nodevault.openapi` | `components/nodevault/openapi` | OpenAPI document composition, models, request/response schemas |
+| `@nodevault/platform.components.configuration` | `components/configuration` | Config builder (`build<T>()`) |
 | `@nodevault/platform.components.context` | `components/context` | `Context`, `InboundEvent`, `Response`, `Log`, middy wrappers |
 | `@nodevault/platform.components.domain` | `components/domain` | Domain models (`User`, `Account`, `LoginToken`, `Contact`), types, geo data |
 | `@nodevault/platform.components.ravendb` | `components/ravendb` | `Session` wrapper, document store helpers, search utilities |
+| `@nodevault/platform.components.search` | `components/search` | Search/query builders |
 | `@nodevault/platform.components.utils` | `components/utils` | Pure utilities — date, string, math (no Node.js-specific APIs) |
 | `@nodevault/platform.components.utils.server` | `components/utils-server` | Server-only utilities — crypto, encoding, JWT |
 | `@nodevault/platform.integrations.resend` | `integrations/resend` | Resend email client — `createResendClient`, `sendEmail` |
+| `@nodevault/platform.integrations.cloudflare` | `integrations/cloudflare` | Cloudflare Workers helpers |
 
 ---
 

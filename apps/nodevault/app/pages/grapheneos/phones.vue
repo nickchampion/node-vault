@@ -125,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { useConfig } from '@nodevault/platform.components.configuration.client'
+import { useConfig } from '@nodevault/platform.components.nodevault.client'
 
 useSeoMeta({
   title: 'Buy a Pre-Configured GrapheneOS Phone | NodeVault',

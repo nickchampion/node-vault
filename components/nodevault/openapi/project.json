@@ -1,0 +1,20 @@
+{
+  "name": "@nodevault/platform.components.nodevault.openapi",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "components/nodevault/openapi",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "components/nodevault/openapi/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

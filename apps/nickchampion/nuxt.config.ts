@@ -1,0 +1,133 @@
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import { defineNuxtConfig, type NuxtConfig } from 'nuxt/config'
+
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig(<NuxtConfig>{
+  compatibilityDate: '2025-07-15',
+
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  ssr: true,
+
+  imports: {
+    autoImport: true,
+  },
+
+  build: {
+    sourcemap: true,
+  },
+
+  sourcemap: {
+    server: true,
+    client: 'hidden',
+  },
+
+  nitro: {
+    routeRules: {
+      // This would stop an index.html file from being generated in SPA mode
+      // So it only applies to SSR builds
+      '/**': { prerender: false },
+    },
+    preset: 'cloudflare_module',
+    node_compat: true,
+    esbuild: {
+      target: 'es2022',
+    },
+  },
+
+  experimental: {
+    payloadExtraction: true, // reduces page size
+    renderJsonPayloads: true,
+  },
+
+  typescript: {
+    typeCheck: false,
+    strict: true,
+  },
+
+  workspaceDir: '../../',
+
+  devtools: {
+    enabled: false,
+    vscode: {
+      reuseExistingServer: true,
+      port: 9003,
+    },
+    timeline: {
+      enabled: true,
+    },
+  },
+
+  devServer: {
+    host: '0.0.0.0',
+    port: 9003,
+  },
+
+  runtimeConfig: {
+    public: {
+      environment: process.env.NUXT_PUBLIC_ENVIRONMENT || '',
+      version: process.env.NUXT_PUBLIC_VERSION || '',
+    },
+  },
+
+  vite: {
+    plugins: [nxViteTsPaths()],
+    cacheDir: '../../node_modules/.vite/apps/nickchampion',
+    build: {
+      sourcemap: true,
+      target: 'es2022',
+    },
+    server: {
+      fs: {
+        strict: false,
+      },
+      allowedHosts: [
+        'www.nickchampion.local',
+        'www.nickchampion.me',
+      ],
+    },
+    esbuild: {
+      target: 'es2022',
+      tsconfigRaw: {
+        compilerOptions: {
+          skipLibCheck: true,
+          noEmit: true,
+        },
+      },
+    },
+  },
+
+  app: {
+    pageTransition: { name: 'ui-fade-in', mode: 'out-in' },
+    layoutTransition: { name: 'ui-fade-in', mode: 'out-in' },
+    head: {
+      meta: [
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover',
+        },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+    },
+  },
+
+  components: [{ path: '~/components', pathPrefix: false }],
+
+  css: ['~/assets/css/main.css'],
+
+  modules: [
+    '@nuxt/ui',
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@nuxtjs/device',
+  ],
+
+  /* modules */
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
+})

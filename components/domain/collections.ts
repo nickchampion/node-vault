@@ -1,4 +1,4 @@
-import { BaseModel } from './models/base.js'
+import { BaseModel } from './base-model.js'
 
 const generate = (id: string, prefix: string) => (id ? `${prefix}/${BaseModel.friendlyId(id)!.toUpperCase()}` : null)
 

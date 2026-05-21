@@ -1,4 +1,4 @@
-import { NodeVaultApiClient } from '@nodevault/platform.components.api.client'
+import { NodeVaultApiClient } from '@nodevault/platform.components.nodevault.client'
 
 export const useApiClient = (): NodeVaultApiClient => {
   const auth = useAuthStore()

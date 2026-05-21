@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ContactRequestSchema } from '@nodevault/platform.components.api.schemas'
+import type { ContactRequestSchema } from '@nodevault/platform.components.nodevault.openapi'
 import { validateContactForm } from '../../utils/validation'
 
 useSeoMeta({

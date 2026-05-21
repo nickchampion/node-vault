@@ -1,8 +1,8 @@
-import type { Response } from '@nodevault/platform.components.api.server'
 import type { Context } from '@nodevault/platform.components.context'
 import { UniqueConstraint } from '@nodevault/platform.components.ravendb'
 import { invariantCultureCompare } from '@nodevault/platform.components.utils'
-import { User } from '@nodevault/platform.components.domain'
+import type { Response } from '@nodevault/platform.components.api'
+import { User } from '@nodevault/platform.components.nodevault.server'
 
 export class UserUniqueConstraints {
   response: Response | null = null

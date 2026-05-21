@@ -1,5 +1,5 @@
-import type { ApiOptions, ApiResponse } from '@nodevault/platform.components.api.client'
-import type { UserSchema, VerifyLoginSchema } from '@nodevault/platform.components.api.schemas'
+import type { ApiOptions, ApiResponse } from '@nodevault/platform.components.nodevault.client'
+import type { UserSchema, VerifyLoginSchema } from '@nodevault/platform.components.nodevault.openapi'
 import { isFutureDate, toUtcIso } from '@nodevault/platform.components.utils'
 
 export const useAuthStore = defineStore('auth', () => {

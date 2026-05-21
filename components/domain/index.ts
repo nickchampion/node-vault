@@ -1,5 +1,5 @@
-export * as models from './models/models.js'
-export * from './models/index.js'
 export * from './types/index.js'
 export * from './collections.js'
 export * from './data/geo.js'
+export { BaseModel } from './base-model.js'
+export * as openapi from './openapi/index.js'

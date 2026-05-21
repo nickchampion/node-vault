@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    ".nuxt/nuxt.d.ts",
+    ".nuxt/**/*.d.ts",
+    "nuxt.d.ts",
+    "app/**/*.ts",
+    "app/**/*.vue",
+    "server/**/*.ts",
+    "server/**/*.vue",
+    "nuxt.config.ts",
+    "../../vue-shim.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    ".output",
+  ],
+
+}

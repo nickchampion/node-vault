@@ -1,8 +1,8 @@
 import { AuthInfo, type ApiHandler } from '@nodevault/platform.components.context'
-import type { Response } from '@nodevault/platform.components.api.server'
-import type { RegisterRequestSchema, VerifyLoginSchema } from '@nodevault/platform.components.api.schemas'
-import { Account, User } from '@nodevault/platform.components.domain'
+import { Account, User } from '@nodevault/platform.components.nodevault.server'
 import { createAuthTokenForUser } from '@nodevault/platform.components.utils.server'
+import type { VerifyLoginSchema, RegisterRequestSchema } from '@nodevault/platform.components.nodevault.openapi'
+import type { Response } from '../../../../components/api'
 import { acquireUniqueConstraints } from '../../utils/constraints'
 
 export const authRegister: ApiHandler = async (context): Promise<Response> => {
@@ -43,7 +43,12 @@ export const authRegister: ApiHandler = async (context): Promise<Response> => {
     return userConstraints.response
   }
 
-  const authInfo = new AuthInfo(user, account)
+  const authInfo = new AuthInfo({
+    ...user,
+    accountName: account.name,
+    accountId: account.id,
+  })
+
   const authTokens = createAuthTokenForUser(authInfo)
   const verifySchema: VerifyLoginSchema = {
     user: user,

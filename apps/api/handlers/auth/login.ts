@@ -1,12 +1,11 @@
 import { randomUUID } from 'node:crypto'
 import type { ApiHandler } from '@nodevault/platform.components.context'
-import type { Response } from '@nodevault/platform.components.api.server'
-import { LoginToken, User } from '@nodevault/platform.components.domain'
 import { toUtcIso, expiresInSeconds } from '@nodevault/platform.components.utils'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { serverConfiguration, LoginToken, User } from '@nodevault/platform.components.nodevault.server'
 import { base64Encode, encrypt } from '@nodevault/platform.components.utils.server'
 import { CONSTANTS } from 'ravendb'
 import { createResendClient } from '@nodevault/platform.integrations.resend'
+import type { Response } from '@nodevault/platform.components.api'
 
 const TOKEN_TTL_SECONDS = 10 * 60
 

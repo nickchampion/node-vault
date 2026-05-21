@@ -60,6 +60,7 @@ export default createConfigForNuxt(
         'unicorn/empty-brace-spaces': 'off',
         'unicorn/prefer-top-level-await': 'off',
         'unicorn/no-array-method-this-argument': 'off',
+        'unicorn/no-abusive-eslint-disable': 'off',
 
         '@typescript-eslint/no-unused-vars': [
           'error',

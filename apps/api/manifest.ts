@@ -1,7 +1,6 @@
 import type { IApiManifest } from '@nodevault/platform.components.context'
-import { models } from '@nodevault/platform.components.domain'
-import { composeOpenApiDocument } from '@nodevault/platform.components.api.schemas'
-import { indexes } from '@nodevault/platform.components.api.server'
+import { models, indexes } from '@nodevault/platform.components.nodevault.server'
+import { composeOpenApiDocument } from '@nodevault/platform.components.nodevault.openapi'
 import { apiHandlers } from './handlers/index.js'
 
 /**

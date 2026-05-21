@@ -1,5 +1,5 @@
 import { migrations } from '@nodevault/platform.components.ravendb'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { serverConfiguration } from '@nodevault/platform.components.nodevault.server'
 import { manifest } from '../manifest'
 
 const load = async (path: string, file: string) => {

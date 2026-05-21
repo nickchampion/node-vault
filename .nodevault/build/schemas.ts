@@ -1,8 +1,7 @@
-/* eslint-disable quotes */
 import { writeFileSync, readFileSync, mkdirSync } from 'node:fs'
-import { generate as generateOpenApi } from 'openapi-typescript-codegen'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { generate as generateOpenApi } from 'openapi-typescript-codegen'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -17,7 +16,7 @@ const ensureFolderExistsSync = (path: string): void => {
 
 const generate = async (doc: string, input: string, output: string) => {
   // write the open API json file to scripts folder
-  //to be used for typescript types and api client generation
+  // to be used for typescript types and api client generation
   writeFileSync(input, doc)
 
   // generate the typescript types from the schema file
@@ -28,38 +27,44 @@ const generate = async (doc: string, input: string, output: string) => {
     exportServices: false,
     exportModels: true,
     indent: 'tab',
-    useUnionTypes: true
+    useUnionTypes: true,
   })
 }
 
 const fix = (path: string) => {
-  const file = readFileSync(path, 'utf-8')
+  const file = readFileSync(path, 'utf8')
   const fixed = file.replaceAll("';", ".js'")
 
   writeFileSync(path, fixed, {
-    encoding: 'utf-8',
-    flag: 'w'
+    encoding: 'utf8',
+    flag: 'w',
   })
 }
 
 const seedIndexFiles = async () => {
-  const file = `export {}`
+  const file = 'export {}'
 
-  ensureFolderExistsSync(path.join(__dirname, `../../components/api/schemas/models`))
+  ensureFolderExistsSync(path.join(__dirname, '../../components/nodevault/openapi/models'))
+  ensureFolderExistsSync(path.join(__dirname, '../../components/domain/openapi/models'))
 
-  writeFileSync(path.join(__dirname, `../../components/api/schemas/models/index.ts`), file, {
-    encoding: 'utf-8',
-    flag: 'w'
+  writeFileSync(path.join(__dirname, '../../components/nodevault/openapi/models/index.ts'), file, {
+    encoding: 'utf8',
+    flag: 'w',
+  })
+
+  writeFileSync(path.join(__dirname, '../../components/domain/openapi/models/index.ts'), file, {
+    encoding: 'utf8',
+    flag: 'w',
   })
 }
 
 const fixRavenDB = () => {
-  const filePath = path.join(__dirname, `../../node_modules/ravendb/dist/esm/Http/RequestExecutor.js`)
-  const file = readFileSync(filePath, 'utf-8')
+  const filePath = path.join(__dirname, '../../node_modules/ravendb/dist/esm/Http/RequestExecutor.js')
+  const file = readFileSync(filePath, 'utf8')
 
   writeFileSync(filePath, file.replace('import(importFix("undici"))', 'import("undici")'), {
-    encoding: 'utf-8',
-    flag: 'w'
+    encoding: 'utf8',
+    flag: 'w',
   })
 }
 
@@ -69,17 +74,26 @@ const schemas = async () => {
 
   ensureFolderExistsSync(path.join(__dirname, '../openapi'))
 
-  const schemas = await import('@nodevault/platform.components.api.schemas')
+  const nodevault = await import('@nodevault/platform.components.nodevault.openapi')
+  const domain = await import('@nodevault/platform.components.domain')
 
-  console.log('\x1b[44m OpenAPI Schemas \x1b[0m')
+  console.log('\u001B[44m OpenAPI Schemas \u001B[0m')
 
   await generate(
-    JSON.stringify(schemas.composeOpenApiDocument()),
+    JSON.stringify(nodevault.composeOpenApiDocument()),
     path.join(__dirname, '../openapi/api.json'),
-    path.join(__dirname, '../../components/api/schemas/models')
+    path.join(__dirname, '../../components/nodevault/openapi/models'),
   )
 
-  fix(path.join(__dirname, '../../components/api/schemas/models', 'index.ts'))
+  fix(path.join(__dirname, '../../components/nodevault/openapi/models', 'index.ts'))
+
+  await generate(
+    JSON.stringify(domain.openapi.composeOpenApiDocument()),
+    path.join(__dirname, '../openapi/domain.json'),
+    path.join(__dirname, '../../components/domain/openapi/models'),
+  )
+
+  fix(path.join(__dirname, '../../components/domain/openapi/models', 'index.ts'))
 }
 
 schemas()

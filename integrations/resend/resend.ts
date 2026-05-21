@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { serverConfiguration } from '@nodevault/platform.components.nodevault.server'
 import { AppError } from '@nodevault/platform.components.domain'
 
 export type SendEmailOptions = {

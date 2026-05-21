@@ -1,9 +1,15 @@
-import type { FileUpload } from '../../api/server/types/file.js'
 import { QuerySettings, QuerySettingsSortBy } from '../../domain/types/search.js'
+import { Response } from '../../api/types/response.js'
 import type { AuthTokens } from './auth.js'
-import { Response } from './response.js'
 
 export type InboundEventType = 'http' | 'event'
+
+export interface FileUpload {
+  size: number
+  filename: string | null
+  mimetype: string | null
+  buffer: Buffer
+}
 
 /**
  * Representation of an event that triggered whatever code is currently executing

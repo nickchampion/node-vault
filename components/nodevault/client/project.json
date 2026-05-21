@@ -1,0 +1,20 @@
+{
+  "name": "@nodevault/platform.components.nodevault.client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "components/nodevault/client",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "components/nodevault/client/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

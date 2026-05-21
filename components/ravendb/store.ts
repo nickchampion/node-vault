@@ -1,5 +1,5 @@
 import { DocumentStore, type IAuthOptions, type ObjectTypeDescriptor, DocumentConventions } from 'ravendb'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { serverConfiguration } from '@nodevault/platform.components.nodevault.server'
 import { MigrationRegistry } from './migrations.js'
 
 let storeInstance: DocumentStore

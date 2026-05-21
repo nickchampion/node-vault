@@ -1,7 +1,6 @@
-import { Api, indexes } from '@nodevault/platform.components.api.server'
-import { composeOpenApiDocument } from '@nodevault/platform.components.api.schemas'
-import { models } from '@nodevault/platform.components.domain'
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { models, indexes, serverConfiguration } from '@nodevault/platform.components.nodevault.server'
+import { composeOpenApiDocument } from '@nodevault/platform.components.nodevault.openapi'
+import { Api } from '@nodevault/platform.components.api'
 import { apiHandlers } from './handlers/index.js'
 
 /**
@@ -25,6 +24,9 @@ const start = async () => {
       indexes: indexes,
       document: composeOpenApiDocument,
     },
+    serverConfiguration.api,
+    serverConfiguration.version,
+    String(serverConfiguration.environment),
   )
 
   await api.start()

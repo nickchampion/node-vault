@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "@nodevault/platform.components.integrations.resend",
-  "sourceRoot": "components/integrations/resend",
+  "name": "@nodevault/platform.integrations.resend",
+  "sourceRoot": "integrations/resend",
   "projectType": "library",
   "targets": {
     "lint": {
@@ -11,7 +11,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "components/integrations/resend/**/*.ts"
+          "integrations/resend/**/*.ts"
         ]
       }
     }

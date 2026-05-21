@@ -1,0 +1,41 @@
+{
+  "name": "@nodevault/platform.apps.nickchampion",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/nickchampion/app",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "apps/nickchampion/**/*.ts"
+        ]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi build && cp ./../../.nodevault/cloudflare/worker.mjs ./.output/server/worker.mjs"
+          }
+        ],
+        "cwd": "apps/nickchampion"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "npx nuxi dev"
+          }
+        ],
+        "cwd": "apps/nickchampion"
+      }
+    }
+  }
+}

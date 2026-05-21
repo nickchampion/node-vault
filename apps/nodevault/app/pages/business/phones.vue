@@ -51,9 +51,13 @@
             class="size-5 text-primary shrink-0 mt-0.5" />
 
           <div>
-            <p class="font-semibold text-sm">{{ item.title }}</p>
+            <p class="font-semibold text-sm">
+              {{ item.title }}
+            </p>
 
-            <p class="text-sm text-muted mt-0.5">{{ item.description }}</p>
+            <p class="text-sm text-muted mt-0.5">
+              {{ item.description }}
+            </p>
           </div>
         </div>
       </div>
@@ -73,7 +77,9 @@
               :name="category.icon"
               class="size-5 text-primary shrink-0" />
 
-            <h3 class="font-semibold text-sm">{{ category.name }}</h3>
+            <h3 class="font-semibold text-sm">
+              {{ category.name }}
+            </h3>
           </div>
 
           <ul class="space-y-1.5">
@@ -106,10 +112,14 @@
               {{ index + 1 }}
             </div>
 
-            <h3 class="font-semibold text-sm">{{ step.title }}</h3>
+            <h3 class="font-semibold text-sm">
+              {{ step.title }}
+            </h3>
           </div>
 
-          <p class="text-sm text-muted pl-11">{{ step.description }}</p>
+          <p class="text-sm text-muted pl-11">
+            {{ step.description }}
+          </p>
         </div>
       </div>
     </UPageSection>
@@ -120,7 +130,9 @@
           name="i-lucide-mail"
           class="size-10 text-primary mx-auto" />
 
-        <h2 class="text-2xl font-bold">Get in touch to discuss your fleet</h2>
+        <h2 class="text-2xl font-bold">
+          Get in touch to discuss your fleet
+        </h2>
 
         <p class="text-muted">
           Tell us how many devices you need, what apps your team uses, and what policies matter
@@ -140,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { useConfig } from '@nodevault/platform.components.configuration.client'
+import { useConfig } from '@nodevault/platform.components.nodevault.client'
 
 useSeoMeta({
   title: 'Business Phone Fleet — GrapheneOS for Teams | NodeVault',

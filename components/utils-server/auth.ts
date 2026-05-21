@@ -1,4 +1,4 @@
-import { serverConfiguration } from '@nodevault/platform.components.configuration.server'
+import { serverConfiguration } from '@nodevault/platform.components.nodevault.server'
 import { AuthInfo, type AuthTokens } from '@nodevault/platform.components.context'
 import { base64Decode, base64Encode, decrypt, encrypt } from '@nodevault/platform.components.utils.server'
 
