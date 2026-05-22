@@ -1,15 +1,24 @@
 <template>
   <UPage>
     <UPageHero
-      title="Privacy Tools for People Who Mean It"
-      description="NodeVault offers four practical privacy services: privacy OS installation for your phone, home network protection, a plug-in privacy appliance, and hands-on privacy audits for small businesses. No jargon, no subscriptions you don't need, no Big Tech."
+      title="Take back control of your digital life"
+      description="Your phone tracks where you go. Your cloud provider reads your files. Your smart TV watches what you watch. None of this is inevitable — and none of it requires technical expertise to fix."
       align="center">
       <template #links>
         <UButton
           to="/phones"
           size="xl"
           icon="i-lucide-smartphone">
-          Privacy Phones
+          De-Google Your Phone
+        </UButton>
+
+        <UButton
+          to="/umbrelos"
+          size="xl"
+          icon="i-lucide-server"
+          variant="outline"
+          color="neutral">
+          Own Your Cloud
         </UButton>
 
         <UButton
@@ -18,54 +27,45 @@
           icon="i-lucide-box"
           variant="outline"
           color="neutral">
-          Privacy Router
-        </UButton>
-
-        <UButton
-          to="/business"
-          size="xl"
-          icon="i-lucide-building-2"
-          variant="outline"
-          color="neutral">
-          For Business
+          Secure Your Network
         </UButton>
       </template>
     </UPageHero>
 
     <UPageSection
-      title="Four Ways to Take Back Your Privacy"
-      description="Each service is independent — choose what applies to you or combine them for layered protection across your devices, network, and organisation."
+      title="Three ways to reduce your digital footprint"
+      description="You don't need to choose between convenience and privacy. These are practical, proven approaches used by people who simply don't want to be tracked."
       align="center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
         <UCard
-          v-for="offering in offerings"
-          :key="offering.title"
+          v-for="area in areas"
+          :key="area.title"
           class="flex flex-col gap-4">
           <div class="flex items-start gap-4">
             <div class="flex items-center justify-center size-12 rounded-xl bg-primary/10 shrink-0">
               <UIcon
-                :name="offering.icon"
+                :name="area.icon"
                 class="size-6 text-primary" />
             </div>
 
             <div class="flex-1">
               <h3 class="font-semibold text-lg leading-tight">
-                {{ offering.title }}
+                {{ area.title }}
               </h3>
 
               <p class="text-sm text-primary font-medium mt-0.5">
-                {{ offering.tagline }}
+                {{ area.tagline }}
               </p>
             </div>
           </div>
 
           <p class="text-sm text-muted flex-1">
-            {{ offering.description }}
+            {{ area.description }}
           </p>
 
           <ul class="space-y-1.5">
             <li
-              v-for="point in offering.points"
+              v-for="point in area.points"
               :key="point"
               class="flex items-start gap-2 text-sm">
               <UIcon
@@ -77,223 +77,184 @@
           </ul>
 
           <UButton
-            :to="offering.href"
+            :to="area.href"
             variant="outline"
             color="neutral"
             icon="i-lucide-arrow-right"
             trailing
             block>
-            {{ offering.cta }}
+            {{ area.cta }}
           </UButton>
         </UCard>
       </div>
     </UPageSection>
 
     <UPageSection
-      title="Why Privacy Matters Now"
+      title="What they're not telling you"
+      description="The business models of the world's largest technology companies depend on your data. Understanding what's collected — and how — is the first step to opting out."
       align="center">
       <UPageGrid>
         <UPageCard
-          v-for="reason in reasons"
-          :key="reason.title"
-          :title="reason.title"
-          :description="reason.description"
-          :icon="reason.icon" />
+          v-for="fact in facts"
+          :key="fact.title"
+          :title="fact.title"
+          :description="fact.description"
+          :icon="fact.icon" />
       </UPageGrid>
     </UPageSection>
 
     <UPageSection
-      title="For Small Businesses"
-      description="Therapists, solicitors, accountants, and GPs have legal obligations under UK GDPR around the sensitive client data they hold. We audit your digital footprint, identify the gaps, and give you a clear remediation plan — without the consultancy day rate."
+      title="This isn't just for tech experts"
       align="center">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         <UCard
-          v-for="sector in sectors"
-          :key="sector.title"
+          v-for="person in people"
+          :key="person.title"
           class="flex flex-col gap-3 text-center items-center p-5">
           <div class="flex items-center justify-center size-10 rounded-xl bg-primary/10">
             <UIcon
-              :name="sector.icon"
+              :name="person.icon"
               class="size-5 text-primary" />
           </div>
 
           <p class="font-semibold text-sm">
-            {{ sector.title }}
+            {{ person.title }}
           </p>
 
           <p class="text-xs text-muted">
-            {{ sector.risk }}
+            {{ person.description }}
           </p>
         </UCard>
-      </div>
-
-      <div class="text-center mt-8">
-        <UButton
-          to="/business"
-          size="lg"
-          icon="i-lucide-arrow-right"
-          trailing>
-          See the Business Privacy Audit
-        </UButton>
       </div>
     </UPageSection>
 
     <UPageSection align="center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <UCard
-          v-for="stat in stats"
-          :key="stat.label"
-          class="text-center p-6 flex flex-col gap-2">
-          <p class="text-3xl font-bold text-primary">
-            {{ stat.value }}
-          </p>
+      <UCard class="max-w-2xl mx-auto text-center p-8 space-y-4">
+        <UIcon
+          name="i-lucide-message-circle"
+          class="size-10 text-primary mx-auto" />
 
-          <p class="font-semibold text-sm">
-            {{ stat.label }}
-          </p>
+        <h2 class="text-2xl font-bold">
+          Not sure where to start?
+        </h2>
 
-          <p class="text-xs text-muted">
-            {{ stat.note }}
-          </p>
-        </UCard>
-      </div>
+        <p class="text-muted">
+          Privacy can feel overwhelming. If you'd like some guidance on any of the above — which approach makes sense for you, what hardware to buy, or how to get started — feel free to get in touch. No sales pitch, no obligation.
+        </p>
+
+        <UButton
+          to="/company/contact"
+          size="xl"
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-arrow-right"
+          trailing>
+          Get in touch
+        </UButton>
+      </UCard>
     </UPageSection>
   </UPage>
 </template>
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'NodeVault | Privacy Phones, Home Network Protection & Business Privacy Audits',
-  description: 'GrapheneOS phone installation, Privacy Router appliance, UmbrelOS home network setup, and GDPR privacy audits for UK small businesses. Practical privacy tools.',
-  ogTitle: 'NodeVault | Privacy Tools for People Who Mean It',
-  ogDescription: 'Four practical privacy services: phone OS installation, home network appliance, self-hosted network setup, and business privacy audits.',
+  title: 'NodeVault | Take Back Control of Your Digital Life',
+  description: 'Practical guides to de-Googling your phone with GrapheneOS, replacing cloud subscriptions with a self-hosted home server, and protecting your home network from IoT surveillance.',
+  ogTitle: 'NodeVault | Take Back Control of Your Digital Life',
+  ogDescription: 'GrapheneOS guides, self-hosted home server setup, and home network privacy. Practical steps to get off Big Tech.',
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'NodeVault | Privacy Phones, Network Protection & Business Audits',
-  twitterDescription: 'GrapheneOS installation, Privacy Router appliance, UmbrelOS home server setup, and GDPR audits for UK small businesses.',
-  keywords: 'GrapheneOS UK, privacy phone UK, Pi-hole hardware UK, home network privacy, GDPR audit small business, UmbrelOS UK, self-hosted home server',
+  keywords: 'GrapheneOS guide, de-google phone, self-hosted cloud, UmbrelOS, privacy router, home network privacy, digital privacy',
 })
 
-const offerings = [
+const areas = [
   {
-    title: 'Privacy Phone Installation',
-    tagline: 'From £200',
+    title: 'De-Google Your Phone',
+    tagline: 'GrapheneOS on a Google Pixel',
     icon: 'i-lucide-smartphone',
     href: '/phones',
-    cta: 'Learn About Phone Installation',
-    description: 'We install GrapheneOS, CalyxOS, or /e/OS on your Google Pixel and configure a privacy app stack from scratch. Send it in, we do the work, and return it ready to use.',
+    cta: 'Learn About GrapheneOS',
+    description: 'Stock Android sends a constant stream of data to Google — location, app usage, contacts, voice queries. GrapheneOS removes all of this at the OS level, giving you a fully functional Android phone with zero telemetry.',
     points: [
-      'GrapheneOS recommended — gold standard in Android privacy',
-      'OS install + full app configuration from £350',
-      'Signal, Bitwarden, Brave, and more pre-configured',
-      'Compatible with Pixel 6 through Pixel 9',
+      'No background data collection at the OS level',
+      'Optional sandboxed Google Play — apps work, Google doesn\'t',
+      'Granular per-app permission controls',
+      'Works on Google Pixel 6 through Pixel 9',
     ],
   },
   {
-    title: 'Home Network (UmbrelOS)',
-    tagline: 'From £150/device + setup',
+    title: 'Own Your Cloud',
+    tagline: 'Self-hosted with UmbrelOS',
     icon: 'i-lucide-server',
     href: '/umbrelos',
-    cta: 'Learn About Home Network',
-    description: 'Replace Dropbox, Google Photos, and cloud subscriptions with apps you run at home on your own hardware. We design and configure your UmbrelOS server so you can leave Big Tech behind.',
+    cta: 'Learn About Self-Hosting',
+    description: 'Every file you store with Google, Dropbox, or Apple is subject to their terms of service, data mining, and the risk of account closure or breach. A home server costs around £130 and runs indefinitely — on hardware you own, in a place you control.',
     points: [
-      'Nextcloud, Jellyfin, Vaultwarden, Home Assistant',
-      'Your data on your hardware, in your home',
-      'We handle the setup and configuration',
-      'Consulting available for custom requirements',
+      'Replace Dropbox, Google Photos and iCloud with your own server',
+      'Files never leave your home network',
+      'No monthly subscriptions after the initial hardware cost',
+      'Nextcloud, Immich, Jellyfin, Vaultwarden, and more',
     ],
   },
   {
-    title: 'Privacy Router',
-    tagline: 'From £175 + £12/mo',
+    title: 'Secure Your Network',
+    tagline: 'DNS blocking, VPN & VLAN isolation',
     icon: 'i-lucide-box',
     href: '/privacy-router',
     cta: 'Learn About Privacy Router',
-    description: 'A pre-configured hardware appliance that gives your whole network DNS blocking, a WireGuard VPN gateway, and VLAN isolation. Every device protected, nothing to install.',
+    description: 'Your smart TV, voice assistant, and IoT devices are phoning home constantly — often without any way to opt out. A privacy router running Pi-hole, WireGuard, and VLANs blocks tracking at the network level and isolates devices that can\'t be trusted.',
     points: [
       'DNS-level ad and tracker blocking for every device',
-      'WireGuard VPN gateway — whole-network protection',
-      'VLAN isolation keeps IoT devices off your main network',
-      'Managed via the NodeVault dashboard',
-    ],
-  },
-  {
-    title: 'Business Privacy Audit',
-    tagline: 'From £500',
-    icon: 'i-lucide-search',
-    href: '/business',
-    cta: 'Learn About the Business Audit',
-    description: 'A hands-on audit of your digital footprint: where your client data goes, what your legal obligations are, and exactly what you need to fix. Written report and remediation plan included.',
-    points: [
-      'Designed for therapists, solicitors, accountants, and GPs',
-      'GDPR compliance gap analysis against all 8 obligations',
-      'Written report with prioritised action plan',
-      'Optional implementation and quarterly retainer available',
+      'VLAN isolation keeps IoT devices away from your laptop',
+      'WireGuard VPN gateway for your whole network',
+      'Open source: Pi-hole, AdGuard Home, OpenWRT',
     ],
   },
 ]
 
-const reasons = [
+const facts = [
   {
-    title: 'Your Phone Tracks Everything',
-    description: 'Stock Android sends location, app usage, and contact data to Google constantly. GrapheneOS eliminates this at the OS level — no Play Services, no background telemetry, no compromise.',
-    icon: 'i-lucide-eye-off',
+    title: 'Android Reports to Google Every Few Minutes',
+    description: 'Even with no apps open and Wi-Fi off, stock Android devices regularly send location, hardware identifiers, and network data to Google servers. This happens at the OS level — it cannot be disabled through settings.',
+    icon: 'i-lucide-radio',
   },
   {
-    title: 'Your Network Is an Open Book',
-    description: 'Smart TVs, voice assistants, and IoT devices phone home to their manufacturers constantly. DNS blocking and VLAN isolation stop this at the network level, for every device simultaneously.',
-    icon: 'i-lucide-wifi-off',
+    title: 'Your Smart TV Tracks What You Watch',
+    description: 'Samsung, LG, and Roku TVs use Automatic Content Recognition (ACR) to identify every frame of content on screen — including from HDMI inputs — and report it back to their ad platforms. It\'s enabled by default.',
+    icon: 'i-lucide-tv',
   },
   {
-    title: 'GDPR Is Not Optional',
-    description: 'UK GDPR applies to every practice handling personal data, regardless of size. A 2-person therapy practice has the same legal obligations as a large firm — and the same ICO enforcement risk.',
-    icon: 'i-lucide-gavel',
+    title: 'Cloud Providers Can Read Your Files',
+    description: 'Dropbox, Google Drive, and OneDrive all reserve the right to scan file contents under their terms of service. Google explicitly uses Drive contents to improve its products. Files on your own hardware are accessible to nobody but you.',
+    icon: 'i-lucide-eye',
   },
   {
-    title: 'US Cloud ≠ EU Compliance',
-    description: 'Google Drive, Dropbox, and Microsoft 365 are subject to the US CLOUD Act. Storing special category client data on US infrastructure creates GDPR exposure that\'s difficult to justify.',
-    icon: 'i-lucide-cloud-off',
-  },
-]
-
-const sectors = [
-  {
-    title: 'Therapists',
-    icon: 'i-lucide-heart-handshake',
-    risk: 'Mental health records are special category data under Article 9',
-  },
-  {
-    title: 'Solicitors',
-    icon: 'i-lucide-scale',
-    risk: 'SRA expects documented cybersecurity practices from all firms',
-  },
-  {
-    title: 'Accountants',
-    icon: 'i-lucide-chart-bar',
-    risk: 'Unencrypted email and US cloud storage are common GDPR failures',
-  },
-  {
-    title: 'Private Healthcare',
-    icon: 'i-lucide-stethoscope',
-    risk: 'Patient records carry the highest GDPR protection requirements',
+    title: 'Your IoT Devices Share a Network with Your Laptop',
+    description: 'By default, a compromised smart bulb, camera, or thermostat can scan and reach other devices on your home network. VLAN isolation prevents this — each device category gets its own network segment and can\'t communicate across them.',
+    icon: 'i-lucide-network',
   },
 ]
 
-const stats = [
+const people = [
   {
-    value: '72 hrs',
-    label: 'ICO breach notification window',
-    note: 'The time you have to report a qualifying data breach to the ICO under UK GDPR Articles 33–34',
+    title: 'Curious individuals',
+    icon: 'i-lucide-user',
+    description: 'You don\'t need a threat model — just the knowledge that your data is your business.',
   },
   {
-    value: '£17.5M',
-    label: 'Maximum ICO fine for serious breaches',
-    note: 'Or 4% of global annual turnover — whichever is higher',
+    title: 'Families',
+    icon: 'i-lucide-users',
+    description: 'A home server and privacy router protect every device in the house, including children\'s devices.',
   },
   {
-    value: '99%',
-    label: 'Small practices with GDPR gaps',
-    note: 'Based on common audit findings — most practices have at least one undocumented processing activity',
+    title: 'Remote workers',
+    icon: 'i-lucide-laptop',
+    description: 'Separate work and personal networks, block tracking, and access your files securely from anywhere.',
+  },
+  {
+    title: 'Healthcare & legal',
+    icon: 'i-lucide-briefcase',
+    description: 'Client confidentiality starts with the tools you use. A de-Googled phone is a meaningful step.',
   },
 ]
 </script>

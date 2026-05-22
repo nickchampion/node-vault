@@ -1,27 +1,40 @@
 <template>
   <UPage>
-    <UPageHero
-      title="Get in touch"
-      description="Thinking about de-Googling your phone, setting up a home server, or building a privacy router — but not sure where to start? Send a message. No sales pitch, no obligation — just honest guidance."
-      align="center" />
+    <section class="bg-gradient-to-br from-sky-50 via-white to-slate-50 border-b border-slate-200 py-12 sm:py-16">
+      <UContainer>
+        <div class="max-w-2xl">
+          <p class="text-sky-600 font-semibold text-sm tracking-wide uppercase mb-3">
+            Contact
+          </p>
 
-    <UContainer class="pb-16 sm:pb-24 lg:pb-32">
-      <div class="max-w-3xl mx-auto">
+          <h1 class="text-4xl font-bold text-slate-900 tracking-tight mb-3">
+            Get in touch
+          </h1>
+
+          <p class="text-lg text-slate-500 leading-relaxed">
+            Whether you have a project in mind, a question, or just want to connect — I'd love to hear from you.
+          </p>
+        </div>
+      </UContainer>
+    </section>
+
+    <UContainer class="py-12">
+      <div class="max-w-2xl">
         <UCard v-if="submitted">
           <div class="flex flex-col items-center gap-4 py-8 text-center">
-            <div class="flex items-center justify-center size-14 rounded-full bg-primary/10">
+            <div class="flex items-center justify-center size-14 rounded-full bg-sky-50">
               <UIcon
                 name="i-lucide-check"
-                class="size-7 text-primary" />
+                class="size-7 text-sky-500" />
             </div>
 
             <div>
-              <h3 class="text-lg font-semibold">
+              <h3 class="text-lg font-semibold text-slate-900">
                 Message sent
               </h3>
 
-              <p class="text-muted mt-1">
-                Thanks {{ state.name }}, we'll be in touch shortly at {{ state.email }}.
+              <p class="text-slate-500 mt-1">
+                Thanks {{ state.name }}, I'll be in touch shortly.
               </p>
             </div>
 
@@ -38,9 +51,9 @@
           v-else
           :validate="validateContactForm"
           :state="state"
-          class="space-y-3"
+          class="space-y-4"
           @submit="submit">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField
               label="Name"
               name="name"
@@ -71,24 +84,13 @@
           </UFormField>
 
           <UFormField
-            label="What's this about?"
-            name="interests"
-            required>
-            <UCheckboxGroup
-              v-model="state.interests"
-              :items="interestOptions"
-              orientation="vertical"
-              class="flex-wrap gap-x-6 gap-y-2" />
-          </UFormField>
-
-          <UFormField
             label="Message"
             name="message"
             required>
             <UTextarea
               v-model="state.message"
-              placeholder="Tell me a bit about where you are and what you're trying to do. The more context the better."
-              :rows="5"
+              placeholder="What would you like to talk about?"
+              :rows="6"
               class="w-full" />
           </UFormField>
 
@@ -96,6 +98,7 @@
             <UButton
               type="submit"
               :loading="pending"
+              color="primary"
               icon="i-lucide-send">
               Send message
             </UButton>
@@ -115,28 +118,22 @@
 </template>
 
 <script setup lang="ts">
+import { validateContactForm } from '../utils/validation/contact'
 import type { ContactRequestSchema } from '@nodevault/platform.components.nodevault.openapi'
-import { validateContactForm } from '../../utils/validation'
 
 useSeoMeta({
-  title: 'Get in Touch | NodeVault',
-  description: 'Have a question about GrapheneOS, self-hosting with UmbrelOS, or setting up a privacy router? Get in touch for honest guidance — no sales pitch, no obligation.',
+  title: 'Contact — Nick Champion',
+  description: 'Get in touch with Nick Champion.',
 })
 
 const config = useConfig()
 
-const interestOptions = [
-  { label: 'GrapheneOS / Privacy Phone', value: 'grapheneos' },
-  { label: 'Home Server (UmbrelOS)', value: 'umbrelos' },
-  { label: 'Privacy Router / Network', value: 'router' },
-  { label: 'Not sure — general question', value: 'other' },
-]
+type FormState = Omit<ContactRequestSchema, 'interests'>
 
-const defaultState = (): ContactRequestSchema => ({
+const defaultState = (): FormState => ({
   name: '',
   email: '',
   phone: undefined,
-  interests: [],
   message: '',
 })
 
@@ -152,7 +149,7 @@ const submit = async () => {
   try {
     await $fetch(`${config.platform.api}/comms/contact`, {
       method: 'POST',
-      body: state,
+      body: { ...state, interests: ['other'] } satisfies ContactRequestSchema,
     })
 
     submitted.value = true

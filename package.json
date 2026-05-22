@@ -13,7 +13,8 @@
     "api:build": "nx reset && reset && nx build @nodevault/platform.apps.api",
     "app": "pnpm run clean && nx reset && reset && nx serve @nodevault/platform.apps.nodevault",
     "app:build": "NITRO_PRESET=cloudflare_module nx build @nodevault/platform.apps.nodevault",
-    "app:cf": "./.nodevault/cloudflare/local.sh"
+    "app:cf": "./.nodevault/cloudflare/local.sh",
+    "nc": "pnpm run clean && nx reset && reset && nx serve @nodevault/platform.apps.nickchampion"
   },
   "private": true,
   "type": "module",

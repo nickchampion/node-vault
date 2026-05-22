@@ -1,17 +1,10 @@
 <template>
   <UPage>
     <UPageHero
-      title="Privacy Router"
-      description="A pre-configured hardware appliance that plugs into your home or office network and gives you whole-network DNS blocking, a built-in VPN gateway, and VLAN isolation — all managed from a single dashboard. Privacy infrastructure, without the engineering degree."
+      title="Your home network is more compromised than you think"
+      description="Smart TVs, voice assistants, thermostats, and light bulbs are all connected to the same network as your laptop and phone. Most of them phone home constantly. A privacy router — running Pi-hole, WireGuard, and VLANs — fixes this for every device at once."
       align="center">
       <template #links>
-        <UButton
-          to="#pricing"
-          size="xl"
-          icon="i-lucide-box">
-          See Pricing
-        </UButton>
-
         <UButton
           to="#how-it-works"
           size="xl"
@@ -20,27 +13,107 @@
           color="neutral">
           How It Works
         </UButton>
+
+        <UButton
+          to="/company/contact"
+          size="xl"
+          icon="i-lucide-message-circle"
+          variant="ghost"
+          color="neutral">
+          Need help getting started?
+        </UButton>
       </template>
     </UPageHero>
 
     <UPageSection
-      title="One Device. Whole-Network Privacy."
-      description="Most privacy tools protect one device at a time. Privacy Router protects every device on your network — phones, laptops, smart TVs, IoT devices — the moment they connect to your Wi-Fi."
+      title="What IoT devices are doing on your network"
+      description="Internet of Things devices are notoriously chatty. Most send data to manufacturer servers constantly — and because they sit on your home network alongside your laptop and phone, a compromised or malicious device represents a real risk."
       align="center">
-      <UPageGrid>
-        <UPageCard
-          v-for="feature in features"
-          :key="feature.title"
-          :title="feature.title"
-          :description="feature.description"
-          :icon="feature.icon" />
-      </UPageGrid>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 max-w-4xl mx-auto">
+        <div
+          v-for="threat in iotThreats"
+          :key="threat.device"
+          class="flex items-start gap-4 p-5 rounded-xl border border-default bg-muted/20">
+          <div class="flex items-center justify-center size-10 rounded-lg bg-muted shrink-0">
+            <UIcon
+              :name="threat.icon"
+              class="size-5 text-muted" />
+          </div>
+
+          <div>
+            <p class="font-semibold text-sm">
+              {{ threat.device }}
+            </p>
+
+            <p class="text-xs text-muted mt-1 leading-relaxed">
+              {{ threat.detail }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <UCallout
+        class="mt-8 max-w-3xl mx-auto text-left"
+        icon="i-lucide-alert-triangle"
+        color="warning">
+        Research by Princeton's IoT Inspector project found that smart TVs contact known advertising and tracking domains thousands of times per day. By default, there is no network-level mechanism to stop them.
+      </UCallout>
+    </UPageSection>
+
+    <UPageSection
+      title="The two core problems — and how to solve them"
+      align="center">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 max-w-4xl mx-auto">
+        <div class="rounded-2xl border border-default p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center size-10 rounded-xl bg-primary/10 shrink-0">
+              <UIcon
+                name="i-lucide-eye-off"
+                class="size-5 text-primary" />
+            </div>
+
+            <h3 class="font-bold">
+              Tracking & surveillance
+            </h3>
+          </div>
+
+          <p class="text-sm text-muted">
+            Every ad network, tracker, and telemetry service your devices contact uses DNS lookups — they have to translate a domain name to an IP address before any data can be sent.
+          </p>
+
+          <p class="text-sm text-muted">
+            A DNS-level blocker (Pi-hole or AdGuard Home) intercepts those lookups before they leave your network. The request never reaches the tracker. This works for <strong>every device on your network</strong> — including TVs, game consoles, and smart speakers that don't support browser extensions or VPNs.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-default p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center size-10 rounded-xl bg-primary/10 shrink-0">
+              <UIcon
+                name="i-lucide-git-branch"
+                class="size-5 text-primary" />
+            </div>
+
+            <h3 class="font-bold">
+              Lateral movement risk
+            </h3>
+          </div>
+
+          <p class="text-sm text-muted">
+            By default, every device on your home network can talk to every other device. A compromised smart bulb, camera, or thermostat could in theory scan your network, identify other devices, and attempt to reach them.
+          </p>
+
+          <p class="text-sm text-muted">
+            VLAN (Virtual LAN) isolation creates separate network segments — your IoT devices, your trusted devices, and your guests each get their own network that cannot communicate with the others. A compromised bulb literally cannot reach your laptop.
+          </p>
+        </div>
+      </div>
     </UPageSection>
 
     <UPageSection
       id="how-it-works"
-      title="How It Works"
-      description="Privacy Router sits between your router and your network. It inspects DNS queries, blocks trackers and ads at the network level, routes traffic through your chosen VPN, and isolates your IoT devices from your main network."
+      title="How a privacy router works"
+      description="A privacy router sits between your ISP router and your home network. It inspects DNS queries, blocks trackers before they connect, routes traffic through VPN, and keeps your IoT devices away from your main network."
       align="center">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <div
@@ -65,15 +138,29 @@
 
       <UCallout
         class="mt-10 text-left max-w-2xl mx-auto"
-        icon="i-lucide-zap"
+        icon="i-lucide-code"
         color="primary">
-        Privacy Router uses open source software — Pi-hole/AdGuard Home for DNS filtering, WireGuard for VPN, and OpenWRT for routing. No proprietary lock-in. We build the hardware, write the configuration, and maintain the software stack so you don't have to.
+        The full software stack — Pi-hole, AdGuard Home, WireGuard, and OpenWRT — is open source, auditable, and community-maintained. You own the hardware, you own the configuration, and there's no vendor lock-in.
       </UCallout>
     </UPageSection>
 
     <UPageSection
-      title="What Gets Blocked"
-      description="DNS-level blocking stops requests before they leave your network. Unlike browser extensions, it protects every device — including those that don't support extensions."
+      title="One device. Every device protected."
+      description="Unlike browser extensions or per-device VPNs, DNS-level blocking works for everything on your network simultaneously."
+      align="center">
+      <UPageGrid>
+        <UPageCard
+          v-for="feature in features"
+          :key="feature.title"
+          :title="feature.title"
+          :description="feature.description"
+          :icon="feature.icon" />
+      </UPageGrid>
+    </UPageSection>
+
+    <UPageSection
+      title="What gets blocked"
+      description="DNS-level blocking stops requests before they leave your network. Unlike browser extensions, it covers every device — including those that don't support extensions at all."
       align="center">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         <div
@@ -98,104 +185,7 @@
     </UPageSection>
 
     <UPageSection
-      id="pricing"
-      title="Choose Your Router"
-      align="center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 max-w-4xl mx-auto">
-        <UCard
-          v-for="plan in plans"
-          :key="plan.name"
-          class="flex flex-col gap-5">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <h3 class="font-semibold text-lg">
-                {{ plan.name }}
-              </h3>
-
-              <UBadge
-                v-if="plan.badge"
-                :color="plan.badgeColor"
-                variant="subtle"
-                size="xs">
-                {{ plan.badge }}
-              </UBadge>
-            </div>
-
-            <p class="text-3xl font-bold">
-              {{ plan.price }}
-            </p>
-
-            <p
-              v-if="plan.subscription"
-              class="text-sm text-muted mt-0.5">
-              + {{ plan.subscription }}/mo subscription
-            </p>
-
-            <p class="text-sm text-muted mt-2">
-              {{ plan.description }}
-            </p>
-          </div>
-
-          <ul class="space-y-2 flex-1">
-            <li
-              v-for="feature in plan.features"
-              :key="feature"
-              class="flex items-start gap-2 text-sm">
-              <UIcon
-                name="i-lucide-check-circle"
-                class="size-4 text-primary shrink-0 mt-0.5" />
-
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
-
-          <UButton
-            to="/company/contact"
-            :variant="plan.primary ? 'solid' : 'outline'"
-            color="neutral"
-            icon="i-lucide-arrow-right"
-            trailing
-            block>
-            Order {{ plan.name }}
-          </UButton>
-        </UCard>
-      </div>
-
-      <div class="mt-8 p-4 rounded-xl border border-default bg-muted/20 max-w-2xl mx-auto text-sm text-muted text-center">
-        <strong class="text-default">Subscription covers:</strong> software updates, blocklist updates, remote monitoring, and priority support. Cancellation returns the router to manual self-managed mode.
-      </div>
-    </UPageSection>
-
-    <UPageSection
-      title="The NodeVault Dashboard"
-      description="Every Privacy Router ships with access to the NodeVault management dashboard. One interface for everything — no SSH, no command line, no config files."
-      align="center">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 max-w-3xl mx-auto">
-        <div
-          v-for="dashFeature in dashboardFeatures"
-          :key="dashFeature.title"
-          class="flex items-start gap-3">
-          <div class="flex items-center justify-center size-8 rounded-lg bg-primary/10 shrink-0">
-            <UIcon
-              :name="dashFeature.icon"
-              class="size-4 text-primary" />
-          </div>
-
-          <div>
-            <p class="font-medium text-sm">
-              {{ dashFeature.title }}
-            </p>
-
-            <p class="text-xs text-muted mt-0.5">
-              {{ dashFeature.description }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </UPageSection>
-
-    <UPageSection
-      title="Who Privacy Router Is For"
+      title="Who this is for"
       align="center">
       <UPageGrid>
         <UPageCard
@@ -210,23 +200,25 @@
     <UPageSection align="center">
       <UCard class="max-w-2xl mx-auto text-center p-8 space-y-4">
         <UIcon
-          name="i-lucide-box"
+          name="i-lucide-message-circle"
           class="size-10 text-primary mx-auto" />
 
         <h2 class="text-2xl font-bold">
-          Interested in Privacy Router?
+          Want some guidance?
         </h2>
 
         <p class="text-muted">
-          Get in touch and we'll confirm availability, delivery timescale, and answer any questions about setup or compatibility with your existing router.
+          If you're thinking about setting up a privacy router and would like some advice — what hardware to use, which software stack makes sense, or how VLANs work — feel free to get in touch. Happy to help.
         </p>
 
         <UButton
           to="/company/contact"
           size="xl"
+          variant="outline"
+          color="neutral"
           icon="i-lucide-arrow-right"
           trailing>
-          Get In Touch
+          Get in touch
         </UButton>
       </UCard>
     </UPageSection>
@@ -235,194 +227,143 @@
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Privacy Router — Whole-Network DNS Blocking & VPN Appliance | NodeVault',
-  description: 'Pre-configured hardware appliance with DNS blocking, WireGuard VPN, and VLAN isolation for your home or small office network. Managed via the NodeVault dashboard.',
-  ogTitle: 'Privacy Router | NodeVault',
-  ogDescription: 'Whole-network privacy in one appliance. DNS blocking, VPN gateway, and IoT isolation — plug in and go.',
+  title: 'Privacy Router — Protect Your Home Network | NodeVault',
+  description: 'Smart TVs, voice assistants, and IoT devices phone home constantly. A privacy router with Pi-hole, WireGuard VPN, and VLANs blocks tracking and isolates risky devices for every device on your network.',
+  ogTitle: 'Privacy Router — Home Network Protection | NodeVault',
+  ogDescription: 'DNS-level tracking protection and VLAN isolation for your home network. Covers every device without installing anything on each one.',
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  keywords: 'privacy router UK, Pi-hole home, DNS blocker hardware, WireGuard VPN home router, network privacy appliance UK, AdGuard Home hardware',
+  keywords: 'privacy router, Pi-hole home, DNS blocker, WireGuard VPN home, VLAN isolation home network, IoT security home, AdGuard Home',
 })
 
-const features = [
+const iotThreats = [
   {
-    title: 'DNS-Level Ad & Tracker Blocking',
-    description: 'Blocks adverts, trackers, and malware domains before they reach any device on your network. Works on phones, tablets, smart TVs, and IoT devices without any per-device configuration.',
-    icon: 'i-lucide-shield-off',
+    device: 'Smart TVs',
+    icon: 'i-lucide-tv',
+    detail: 'Samsung, LG, and Vizio TVs use Automatic Content Recognition to identify every frame of content on screen and report it to advertising platforms. Samsung TVs alone contact over 700 distinct tracking domains. This cannot be disabled from the settings menu.',
   },
   {
-    title: 'WireGuard VPN Gateway',
-    description: 'Connects your whole network to a VPN provider of your choice, or to a NodeVault-managed WireGuard server. Every device gets VPN protection automatically — no apps to configure.',
-    icon: 'i-lucide-lock',
+    device: 'Amazon Echo / Google Nest',
+    icon: 'i-lucide-mic',
+    detail: 'Voice assistants listen for wake words continuously and send audio snippets to manufacturer servers. Both Amazon and Google employ human reviewers who listen to recordings. Amazon retains recordings indefinitely unless manually deleted.',
   },
   {
-    title: 'VLAN Isolation',
-    description: 'Separates your IoT devices from your main network using VLANs. Your smart speaker cannot talk to your laptop, even if one is compromised. Critical for homes with smart home devices.',
-    icon: 'i-lucide-git-branch',
+    device: 'Smart thermostats & cameras',
+    icon: 'i-lucide-thermometer',
+    detail: 'Nest, Ring, and Arlo devices send continuous telemetry including home/away patterns, motion events, and in Ring\'s case, have historically shared footage with law enforcement without user consent.',
   },
   {
-    title: 'NodeVault Dashboard',
-    description: 'A web interface purpose-built for Privacy Router lets you see what\'s being blocked, update settings, and manage VPN connections — no command line knowledge required.',
-    icon: 'i-lucide-layout-dashboard',
+    device: 'Smart appliances & bulbs',
+    icon: 'i-lucide-lightbulb',
+    detail: 'Philips Hue, LIFX, and similar devices regularly contact manufacturer servers even when fully functional offline. Security researchers have found vulnerabilities in smart bulbs that allow network scanning from the device.',
   },
   {
-    title: 'Automatic Updates',
-    description: 'Blocklists, firmware, and software are kept up to date automatically with subscription. Emerging threats are blocked without you needing to think about it.',
-    icon: 'i-lucide-refresh-cw',
+    device: 'Games consoles',
+    icon: 'i-lucide-gamepad-2',
+    detail: 'Xbox and PlayStation devices send detailed telemetry about usage patterns, achievement data, and network topology to Microsoft and Sony. They also serve advertising and cannot be fully opted out of.',
   },
   {
-    title: 'Open Source Stack',
-    description: 'Pi-hole, AdGuard Home, WireGuard, and OpenWRT — all auditable, community-maintained, and with no vendor lock-in. You own the hardware and the configuration.',
-    icon: 'i-lucide-code',
+    device: 'Printers',
+    icon: 'i-lucide-printer',
+    detail: 'HP, Canon, and Epson printers phone home regularly — reporting ink levels, usage statistics, and in some cases, a log of what you\'ve printed. Some printers contact manufacturer servers even when printing locally.',
   },
 ]
 
 const howItWorks = [
   {
-    title: 'Plug In',
-    description: 'Connect Privacy Router between your router and your network switch (or directly to your router\'s LAN port). Takes about 5 minutes.',
+    title: 'Plug in',
+    description: 'The privacy router connects between your ISP router and your home network. All traffic passes through it.',
   },
   {
-    title: 'DNS Intercept',
-    description: 'Privacy Router becomes the DNS resolver for your network. Every domain lookup passes through it before going anywhere.',
+    title: 'DNS intercept',
+    description: 'Every DNS lookup from every device passes through Pi-hole or AdGuard Home before going anywhere on the internet.',
   },
   {
-    title: 'Block & Filter',
-    description: 'Known tracker, ad, and malware domains are blocked at the DNS level. Clean requests are forwarded through encrypted DNS-over-HTTPS.',
+    title: 'Block & filter',
+    description: 'Known tracking, ad, and malware domains are blocked at the DNS level. Clean requests are forwarded via encrypted DNS-over-HTTPS.',
   },
   {
-    title: 'VPN Routing',
-    description: 'Traffic from configured devices is routed through your chosen WireGuard VPN endpoint. IoT devices get isolated into their own VLAN automatically.',
+    title: 'VLAN isolation',
+    description: 'IoT devices, trusted devices, and guests are separated into distinct network segments that cannot communicate with each other.',
+  },
+]
+
+const features = [
+  {
+    title: 'DNS-Level Ad & Tracker Blocking',
+    description: 'Blocks trackers, adverts, and malware domains before they reach any device. Works on phones, TVs, smart speakers, and anything else connected to your Wi-Fi without per-device setup.',
+    icon: 'i-lucide-shield-off',
+  },
+  {
+    title: 'WireGuard VPN Gateway',
+    description: 'Connects your entire network to a VPN provider of your choice. Every device gets VPN protection without needing its own VPN app or configuration.',
+    icon: 'i-lucide-lock',
+  },
+  {
+    title: 'VLAN Isolation',
+    description: 'Separates your IoT devices from your main network. Smart home devices cannot communicate with your laptop or phone — even if one is compromised or malicious.',
+    icon: 'i-lucide-git-branch',
+  },
+  {
+    title: 'Open Source Stack',
+    description: 'Pi-hole, AdGuard Home, WireGuard, and OpenWRT — all community-maintained and fully auditable. You own the hardware and the config. No subscriptions, no vendor lock-in.',
+    icon: 'i-lucide-code',
   },
 ]
 
 const blockedCategories = [
   {
-    title: 'Advertising Networks',
+    title: 'Advertising networks',
     description: 'Google Ads, Facebook Pixel, and hundreds of other ad networks — blocked before the request leaves your network.',
     icon: 'i-lucide-ban',
   },
   {
-    title: 'Tracking & Analytics',
+    title: 'Tracking & analytics',
     description: 'Google Analytics, Facebook tracking, Hotjar, and other behavioural analytics tools that follow you across the web.',
     icon: 'i-lucide-eye-off',
   },
   {
-    title: 'Smart TV & IoT Telemetry',
-    description: 'Samsung, LG, Roku, and smart appliance telemetry that sends usage data back to manufacturers without asking.',
+    title: 'Smart TV & IoT telemetry',
+    description: 'Samsung, LG, Roku, and smart appliance telemetry that sends usage and viewing data back to manufacturers.',
     icon: 'i-lucide-tv',
   },
   {
-    title: 'Malware & Phishing',
-    description: 'Known malware distribution domains and phishing sites — blocked for every device on your network.',
+    title: 'Malware & phishing domains',
+    description: 'Known malware distribution and phishing sites — blocked for every device on your network automatically.',
     icon: 'i-lucide-bug',
   },
   {
-    title: 'Social Media Trackers',
-    description: 'Facebook, Twitter/X, and LinkedIn tracking scripts embedded in third-party websites.',
+    title: 'Social media trackers',
+    description: 'Facebook, X/Twitter, and LinkedIn tracking scripts embedded in third-party websites you visit.',
     icon: 'i-lucide-share-2',
   },
   {
-    title: 'Data Broker Domains',
-    description: 'Acxiom, Experian Marketing, and similar data broker platforms that aggregate browsing behaviour.',
+    title: 'Data broker platforms',
+    description: 'Acxiom, Experian Marketing, and similar data aggregators that profile your browsing behaviour across sites.',
     icon: 'i-lucide-database',
-  },
-]
-
-const plans = [
-  {
-    name: 'Home Router',
-    price: '£175',
-    subscription: '£12',
-    badge: null,
-    badgeColor: 'neutral' as const,
-    primary: false,
-    description: 'For households up to 50 devices. Built on Raspberry Pi 5 with a fanless enclosure.',
-    features: [
-      'Raspberry Pi 5 hardware, fanless enclosure',
-      'Pi-hole + AdGuard Home DNS filtering',
-      'WireGuard VPN gateway (your provider)',
-      'Basic VLAN support (2 networks)',
-      'NodeVault dashboard access',
-      'Setup guide and remote onboarding call',
-      '12/mo subscription: updates + support',
-    ],
-  },
-  {
-    name: 'Office Router',
-    price: '£275',
-    subscription: '£20',
-    badge: 'More Powerful',
-    badgeColor: 'primary' as const,
-    primary: true,
-    description: 'For small offices up to 100 devices. Built on Protectli hardware with dual NICs.',
-    features: [
-      'Protectli VP2420 quad-core hardware',
-      'Dual NIC for proper router-mode deployment',
-      'Pi-hole + AdGuard Home with custom lists',
-      'WireGuard VPN gateway (your provider or managed)',
-      'Full VLAN isolation (up to 8 networks)',
-      'Traffic logging and query history',
-      'NodeVault dashboard with user management',
-      'Setup guide, remote onboarding, and priority support',
-      '12/mo subscription: updates, monitoring + support',
-    ],
-  },
-]
-
-const dashboardFeatures = [
-  {
-    title: 'Blocklist Management',
-    icon: 'i-lucide-list-filter',
-    description: 'Add, remove, and manage blocklists. See which domains are being queried and blocked in real time.',
-  },
-  {
-    title: 'VPN Status',
-    icon: 'i-lucide-lock',
-    description: 'See which devices are using the VPN, which server they\'re connected to, and toggle connections per device.',
-  },
-  {
-    title: 'VLAN Configuration',
-    icon: 'i-lucide-network',
-    description: 'Assign devices to networks, configure isolation rules, and see what\'s connected where — without touching config files.',
-  },
-  {
-    title: 'Query Log',
-    icon: 'i-lucide-file-text',
-    description: 'Full DNS query history with block/allow status. See exactly what your devices are trying to connect to.',
-  },
-  {
-    title: 'Update Control',
-    icon: 'i-lucide-refresh-cw',
-    description: 'Approve or schedule firmware and blocklist updates. Automatic updates can be enabled or managed manually.',
-  },
-  {
-    title: 'Alerts',
-    icon: 'i-lucide-bell',
-    description: 'Email or push notifications for suspicious activity, device connectivity issues, or VPN drops.',
   },
 ]
 
 const audiences = [
   {
-    title: 'Privacy-Conscious Households',
+    title: 'Privacy-conscious households',
     description: 'Protect every device in your home — phones, tablets, smart TVs, and voice assistants — without installing anything on each one individually.',
     icon: 'i-lucide-home',
   },
   {
-    title: 'Remote Workers',
-    description: 'A WireGuard VPN gateway means your home office has the same network-level protection as a corporate environment — without a monthly SaaS subscription.',
+    title: 'Smart home owners',
+    description: 'Smart speakers, cameras, and appliances are notoriously chatty. A privacy router blocks their telemetry and isolates them so a compromised bulb can\'t reach your laptop.',
+    icon: 'i-lucide-cpu',
+  },
+  {
+    title: 'Remote workers',
+    description: 'A WireGuard VPN gateway gives your home network the same protection as a corporate environment — without a monthly SaaS subscription.',
     icon: 'i-lucide-laptop',
   },
   {
-    title: 'Small Offices',
-    description: 'VLAN isolation means your guest Wi-Fi can\'t access your file server, and your IoT devices can\'t reach your accountancy software. Simple network security, properly done.',
-    icon: 'i-lucide-building-2',
-  },
-  {
-    title: 'Smart Home Owners',
-    description: 'Smart speakers, cameras, and appliances are notoriously chatty. Privacy Router blocks their telemetry and isolates them from your main network so a compromised bulb can\'t reach your laptop.',
-    icon: 'i-lucide-cpu',
+    title: 'Families',
+    description: 'DNS-level blocking also covers malware and phishing domains — protecting children\'s devices, games consoles, and every other device in the house simultaneously.',
+    icon: 'i-lucide-users',
   },
 ]
 </script>

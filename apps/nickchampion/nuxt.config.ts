@@ -119,6 +119,11 @@ export default defineNuxtConfig(<NuxtConfig>{
 
   css: ['~/assets/css/main.css'],
 
+  colorMode: {
+    preference: 'light',
+    fallback: 'light',
+  },
+
   modules: [
     '@nuxt/ui',
     '@vueuse/nuxt',

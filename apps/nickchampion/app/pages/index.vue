@@ -1,299 +1,333 @@
 <template>
   <UPage>
-    <UPageHero
-      title="Privacy Tools for People Who Mean It"
-      description="NodeVault offers four practical privacy services: privacy OS installation for your phone, home network protection, a plug-in privacy appliance, and hands-on privacy audits for small businesses. No jargon, no subscriptions you don't need, no Big Tech."
-      align="center">
-      <template #links>
-        <UButton
-          to="/phones"
-          size="xl"
-          icon="i-lucide-smartphone">
-          Privacy Phones
-        </UButton>
+    <!-- Hero -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-sky-50 via-white to-slate-50 py-20 sm:py-28">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(14,165,233,0.08),_transparent_60%)]" />
 
-        <UButton
-          to="/privacy-router"
-          size="xl"
-          icon="i-lucide-box"
-          variant="outline"
-          color="neutral">
-          Privacy Router
-        </UButton>
+      <UContainer class="relative">
+        <div class="max-w-3xl">
+          <p class="text-sky-600 font-semibold text-sm tracking-wide uppercase mb-4">
+            Engineering Leadership
+          </p>
 
-        <UButton
-          to="/business"
-          size="xl"
-          icon="i-lucide-building-2"
-          variant="outline"
-          color="neutral">
-          For Business
-        </UButton>
-      </template>
-    </UPageHero>
+          <h1 class="text-5xl sm:text-6xl font-bold text-slate-900 tracking-tight leading-tight mb-6">
+            Nick Champion
+          </h1>
 
+          <p class="text-xl sm:text-2xl text-slate-600 font-medium mb-4">
+            VP of Engineering · 20+ Years Building Software
+          </p>
+
+          <p class="text-lg text-slate-500 leading-relaxed max-w-2xl mb-10">
+            Hands-on engineer and team leader with a track record of building and modernising platforms,
+            scaling high-traffic systems, and growing the teams that ship them.
+            Based in London.
+          </p>
+
+          <div class="flex flex-wrap gap-3">
+            <UButton
+              to="/cv"
+              size="lg"
+              color="primary"
+              icon="i-lucide-file-text"
+              trailing>
+              View my CV
+            </UButton>
+
+            <UButton
+              to="/contact"
+              size="lg"
+              variant="outline"
+              color="neutral"
+              icon="i-lucide-mail"
+              trailing>
+              Get in touch
+            </UButton>
+          </div>
+        </div>
+      </UContainer>
+    </section>
+
+    <!-- Profile -->
+    <UPageSection>
+      <UContainer>
+        <div class="max-w-3xl mx-auto text-center">
+          <h2 class="text-2xl font-bold text-slate-900 mb-4">
+            What I do
+          </h2>
+
+          <p class="text-slate-600 text-lg leading-relaxed">
+            Pragmatic and delivery-focused with deep understanding of the software development lifecycle —
+            from architecture and coding through to cloud infrastructure, observability, DevOps and
+            operational maturity. Strong track record of modernising platforms, improving engineering
+            workflows and leading distributed teams across multiple time zones.
+          </p>
+        </div>
+      </UContainer>
+    </UPageSection>
+
+    <!-- Key Strengths -->
     <UPageSection
-      title="Four Ways to Take Back Your Privacy"
-      description="Each service is independent — choose what applies to you or combine them for layered protection across your devices, network, and organisation."
-      align="center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-        <UCard
-          v-for="offering in offerings"
-          :key="offering.title"
-          class="flex flex-col gap-4">
-          <div class="flex items-start gap-4">
-            <div class="flex items-center justify-center size-12 rounded-xl bg-primary/10 shrink-0">
+      class="bg-slate-50">
+      <UContainer>
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            Key strengths
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div
+            v-for="strength in strengths"
+            :key="strength.title"
+            class="bg-white rounded-xl p-6 border border-slate-200 flex gap-4">
+            <div class="flex items-center justify-center size-10 rounded-lg bg-sky-50 shrink-0">
               <UIcon
-                :name="offering.icon"
-                class="size-6 text-primary" />
+                :name="strength.icon"
+                class="size-5 text-sky-600" />
             </div>
 
-            <div class="flex-1">
-              <h3 class="font-semibold text-lg leading-tight">
-                {{ offering.title }}
+            <div>
+              <h3 class="font-semibold text-slate-900 text-sm mb-1">
+                {{ strength.title }}
               </h3>
 
-              <p class="text-sm text-primary font-medium mt-0.5">
-                {{ offering.tagline }}
+              <p class="text-sm text-slate-500 leading-snug">
+                {{ strength.description }}
               </p>
             </div>
           </div>
-
-          <p class="text-sm text-muted flex-1">
-            {{ offering.description }}
-          </p>
-
-          <ul class="space-y-1.5">
-            <li
-              v-for="point in offering.points"
-              :key="point"
-              class="flex items-start gap-2 text-sm">
-              <UIcon
-                name="i-lucide-check"
-                class="size-4 text-primary shrink-0 mt-0.5" />
-
-              <span>{{ point }}</span>
-            </li>
-          </ul>
-
-          <UButton
-            :to="offering.href"
-            variant="outline"
-            color="neutral"
-            icon="i-lucide-arrow-right"
-            trailing
-            block>
-            {{ offering.cta }}
-          </UButton>
-        </UCard>
-      </div>
+        </div>
+      </UContainer>
     </UPageSection>
 
-    <UPageSection
-      title="Why Privacy Matters Now"
-      align="center">
-      <UPageGrid>
-        <UPageCard
-          v-for="reason in reasons"
-          :key="reason.title"
-          :title="reason.title"
-          :description="reason.description"
-          :icon="reason.icon" />
-      </UPageGrid>
-    </UPageSection>
+    <!-- Technical Expertise -->
+    <UPageSection>
+      <UContainer>
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            Technical expertise
+          </h2>
+        </div>
 
-    <UPageSection
-      title="For Small Businesses"
-      description="Therapists, solicitors, accountants, and GPs have legal obligations under UK GDPR around the sensitive client data they hold. We audit your digital footprint, identify the gaps, and give you a clear remediation plan — without the consultancy day rate."
-      align="center">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-        <UCard
-          v-for="sector in sectors"
-          :key="sector.title"
-          class="flex flex-col gap-3 text-center items-center p-5">
-          <div class="flex items-center justify-center size-10 rounded-xl bg-primary/10">
-            <UIcon
-              :name="sector.icon"
-              class="size-5 text-primary" />
+        <div class="max-w-3xl mx-auto space-y-5">
+          <div
+            v-for="category in expertise"
+            :key="category.label"
+            class="flex flex-col sm:flex-row sm:items-start gap-3">
+            <span class="text-sm font-semibold text-slate-500 w-36 shrink-0 pt-1">{{ category.label }}</span>
+
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="skill in category.skills"
+                :key="skill"
+                variant="subtle"
+                color="primary"
+                size="md">
+                {{ skill }}
+              </UBadge>
+            </div>
           </div>
-
-          <p class="font-semibold text-sm">
-            {{ sector.title }}
-          </p>
-
-          <p class="text-xs text-muted">
-            {{ sector.risk }}
-          </p>
-        </UCard>
-      </div>
-
-      <div class="text-center mt-8">
-        <UButton
-          to="/business"
-          size="lg"
-          icon="i-lucide-arrow-right"
-          trailing>
-          See the Business Privacy Audit
-        </UButton>
-      </div>
+        </div>
+      </UContainer>
     </UPageSection>
 
-    <UPageSection align="center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <UCard
-          v-for="stat in stats"
-          :key="stat.label"
-          class="text-center p-6 flex flex-col gap-2">
-          <p class="text-3xl font-bold text-primary">
-            {{ stat.value }}
-          </p>
+    <!-- Projects -->
+    <UPageSection class="bg-slate-50">
+      <UContainer>
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            What I'm building
+          </h2>
+        </div>
 
-          <p class="font-semibold text-sm">
-            {{ stat.label }}
-          </p>
+        <div class="max-w-3xl mx-auto">
+          <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            <div class="p-6 sm:p-8">
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-bold text-slate-900 text-lg">
+                      NodeVault
+                    </h3>
 
-          <p class="text-xs text-muted">
-            {{ stat.note }}
-          </p>
-        </UCard>
-      </div>
+                    <UBadge
+                      color="success"
+                      variant="subtle"
+                      size="sm"
+                      icon="i-lucide-circle">
+                      Live
+                    </UBadge>
+                  </div>
+
+                  <p class="text-sky-600 font-semibold text-sm">
+                    Take back control of your digital life
+                  </p>
+                </div>
+              </div>
+
+              <p class="text-slate-600 text-sm leading-relaxed mb-5">
+                A privacy information portal — covering GrapheneOS phones,
+                UmbrelOS self-hosting, and home network protection. Full-stack: Nuxt 4 on Cloudflare
+                Workers, Node.js/OpenAPI API on Fly.io, RavenDB, NX monorepo.
+              </p>
+
+              <div class="flex flex-wrap gap-1.5 mb-6">
+                <UBadge
+                  v-for="tech in ['Nuxt 4', 'Vue.js', 'Node.js', 'OpenAPI', 'Cloudflare Workers', 'RavenDB', 'TypeScript']"
+                  :key="tech"
+                  variant="subtle"
+                  color="neutral"
+                  size="sm">
+                  {{ tech }}
+                </UBadge>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <UButton
+                  to="/nodevault"
+                  variant="outline"
+                  color="primary"
+                  size="sm"
+                  icon="i-lucide-arrow-right"
+                  trailing>
+                  Project details
+                </UButton>
+
+                <UButton
+                  href="https://www.nodevault.cloud"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="ghost"
+                  color="neutral"
+                  size="sm"
+                  icon="i-lucide-external-link"
+                  trailing>
+                  nodevault.cloud
+                </UButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </UContainer>
+    </UPageSection>
+
+    <!-- Career Highlights -->
+    <UPageSection>
+      <UContainer>
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            Recent roles
+          </h2>
+        </div>
+
+        <div class="max-w-3xl mx-auto space-y-4">
+          <div
+            v-for="role in recentRoles"
+            :key="role.company"
+            class="bg-white rounded-xl p-6 border border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-3">
+              <div>
+                <h3 class="font-bold text-slate-900">
+                  {{ role.company }}
+                </h3>
+
+                <p class="text-sky-600 font-semibold text-sm">
+                  {{ role.title }}
+                </p>
+              </div>
+
+              <span class="text-sm text-slate-400 shrink-0">{{ role.dates }}</span>
+            </div>
+
+            <p class="text-sm text-slate-600 leading-relaxed">
+              {{ role.summary }}
+            </p>
+          </div>
+        </div>
+
+        <div class="text-center mt-8">
+          <UButton
+            to="/cv"
+            variant="outline"
+            color="primary"
+            icon="i-lucide-arrow-right"
+            trailing>
+            See full career history
+          </UButton>
+        </div>
+      </UContainer>
     </UPageSection>
   </UPage>
 </template>
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'NodeVault | Privacy Phones, Home Network Protection & Business Privacy Audits',
-  description: 'GrapheneOS phone installation, Privacy Router appliance, UmbrelOS home network setup, and GDPR privacy audits for UK small businesses. Practical privacy tools.',
-  ogTitle: 'NodeVault | Privacy Tools for People Who Mean It',
-  ogDescription: 'Four practical privacy services: phone OS installation, home network appliance, self-hosted network setup, and business privacy audits.',
-  ogType: 'website',
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'NodeVault | Privacy Phones, Network Protection & Business Audits',
-  twitterDescription: 'GrapheneOS installation, Privacy Router appliance, UmbrelOS home server setup, and GDPR audits for UK small businesses.',
-  keywords: 'GrapheneOS UK, privacy phone UK, Pi-hole hardware UK, home network privacy, GDPR audit small business, UmbrelOS UK, self-hosted home server',
+  title: 'Nick Champion — Engineering Leadership',
+  description: 'Hands-on engineer and VP of Engineering with 25 years\' experience building, scaling and leading software delivery teams.',
 })
 
-const offerings = [
+const strengths = [
   {
-    title: 'Privacy Phone Installation',
-    tagline: 'From £200',
-    icon: 'i-lucide-smartphone',
-    href: '/phones',
-    cta: 'Learn About Phone Installation',
-    description: 'We install GrapheneOS, CalyxOS, or /e/OS on your Google Pixel and configure a privacy app stack from scratch. Send it in, we do the work, and return it ready to use.',
-    points: [
-      'GrapheneOS recommended — gold standard in Android privacy',
-      'OS install + full app configuration from £350',
-      'Signal, Bitwarden, Brave, and more pre-configured',
-      'Compatible with Pixel 6 through Pixel 9',
-    ],
+    title: 'Platform Architecture',
+    description: 'Greenfield development, systems design, and platform modernisation and re-architecture.',
+    icon: 'i-lucide-layers',
   },
   {
-    title: 'Home Network (UmbrelOS)',
-    tagline: 'From £150/device + setup',
-    icon: 'i-lucide-server',
-    href: '/umbrelos',
-    cta: 'Learn About Home Network',
-    description: 'Replace Dropbox, Google Photos, and cloud subscriptions with apps you run at home on your own hardware. We design and configure your UmbrelOS server so you can leave Big Tech behind.',
-    points: [
-      'Nextcloud, Jellyfin, Vaultwarden, Home Assistant',
-      'Your data on your hardware, in your home',
-      'We handle the setup and configuration',
-      'Consulting available for custom requirements',
-    ],
+    title: 'High-Traffic Systems',
+    description: 'E-commerce and marketplace systems handling tens of millions of requests per day.',
+    icon: 'i-lucide-zap',
   },
   {
-    title: 'Privacy Router',
-    tagline: 'From £175 + £12/mo',
-    icon: 'i-lucide-box',
-    href: '/privacy-router',
-    cta: 'Learn About Privacy Router',
-    description: 'A pre-configured hardware appliance that gives your whole network DNS blocking, a WireGuard VPN gateway, and VLAN isolation. Every device protected, nothing to install.',
-    points: [
-      'DNS-level ad and tracker blocking for every device',
-      'WireGuard VPN gateway — whole-network protection',
-      'VLAN isolation keeps IoT devices off your main network',
-      'Managed via the NodeVault dashboard',
-    ],
+    title: 'Cloud-Native Delivery',
+    description: 'AWS and Cloudflare infrastructure, CI/CD pipelines, and operational observability.',
+    icon: 'i-lucide-cloud',
   },
   {
-    title: 'Business Privacy Audit',
-    tagline: 'From £500',
-    icon: 'i-lucide-search',
-    href: '/business',
-    cta: 'Learn About the Business Audit',
-    description: 'A hands-on audit of your digital footprint: where your client data goes, what your legal obligations are, and exactly what you need to fix. Written report and remediation plan included.',
-    points: [
-      'Designed for therapists, solicitors, accountants, and GPs',
-      'GDPR compliance gap analysis against all 8 obligations',
-      'Written report with prioritised action plan',
-      'Optional implementation and quarterly retainer available',
-    ],
+    title: 'DevOps & Developer Productivity',
+    description: 'CI/CD, release visibility, workflow automation, and engineering tooling.',
+    icon: 'i-lucide-terminal',
+  },
+  {
+    title: 'Team Leadership',
+    description: 'Hiring, onboarding, coaching, and managing distributed engineering teams.',
+    icon: 'i-lucide-users',
+  },
+  {
+    title: 'Stakeholder Communication',
+    description: 'Delivery planning, technical roadmaps, and communication in fast-changing environments.',
+    icon: 'i-lucide-message-square',
   },
 ]
 
-const reasons = [
-  {
-    title: 'Your Phone Tracks Everything',
-    description: 'Stock Android sends location, app usage, and contact data to Google constantly. GrapheneOS eliminates this at the OS level — no Play Services, no background telemetry, no compromise.',
-    icon: 'i-lucide-eye-off',
-  },
-  {
-    title: 'Your Network Is an Open Book',
-    description: 'Smart TVs, voice assistants, and IoT devices phone home to their manufacturers constantly. DNS blocking and VLAN isolation stop this at the network level, for every device simultaneously.',
-    icon: 'i-lucide-wifi-off',
-  },
-  {
-    title: 'GDPR Is Not Optional',
-    description: 'UK GDPR applies to every practice handling personal data, regardless of size. A 2-person therapy practice has the same legal obligations as a large firm — and the same ICO enforcement risk.',
-    icon: 'i-lucide-gavel',
-  },
-  {
-    title: 'US Cloud ≠ EU Compliance',
-    description: 'Google Drive, Dropbox, and Microsoft 365 are subject to the US CLOUD Act. Storing special category client data on US infrastructure creates GDPR exposure that\'s difficult to justify.',
-    icon: 'i-lucide-cloud-off',
-  },
+const expertise = [
+  { label: 'Languages', skills: ['TypeScript', 'JavaScript', 'C#', 'SQL'] },
+  { label: 'Backend', skills: ['Node.js', 'Deno', '.NET', 'OpenAPI', 'Koa'] },
+  { label: 'Frontend', skills: ['Vue.js', 'Nuxt', 'HTML', 'Tailwind CSS'] },
+  { label: 'Cloud', skills: ['AWS', 'Cloudflare Workers', 'Docker', 'Cloudflare R2', 'Lambda', 'Fargate'] },
+  { label: 'Datastores', skills: ['SQL Server', 'PostgreSQL', 'RavenDB', 'MongoDB', 'Redis'] },
+  { label: 'DevOps', skills: ['GitHub Actions', 'CloudFormation', 'CloudWatch', 'ELK / OpenSearch'] },
+  { label: 'Search', skills: ['Elasticsearch', 'Lucene', 'Solr'] },
 ]
 
-const sectors = [
+const recentRoles = [
   {
-    title: 'Therapists',
-    icon: 'i-lucide-heart-handshake',
-    risk: 'Mental health records are special category data under Article 9',
+    company: 'Hectare Agritech',
+    title: 'VP of Engineering',
+    dates: 'Feb 2022 – May 2026',
+    summary: 'Hired to transform the engineering function: rebuilt core backend systems from scratch in 3 months, overhauled CI/CD and development workflow, grew the team from 8 to 15 engineers, and drove platform modernisation across AWS, Cloudflare, and RavenDB.',
   },
   {
-    title: 'Solicitors',
-    icon: 'i-lucide-scale',
-    risk: 'SRA expects documented cybersecurity practices from all firms',
+    company: 'Reebonz / Reebonz Marketplace (Singapore)',
+    title: 'Chief Engineer',
+    dates: 'Jan 2015 – Feb 2022',
+    summary: 'End-to-end responsibility for launching and operating a marketplace platform across 7 Asia-Pacific markets. Scaled backend systems to ~20M+ requests/day, supported ~SGD 250m annual revenue, and managed remote engineering teams in Indonesia and Vietnam.',
   },
   {
-    title: 'Accountants',
-    icon: 'i-lucide-chart-bar',
-    risk: 'Unencrypted email and US cloud storage are common GDPR failures',
-  },
-  {
-    title: 'Private Healthcare',
-    icon: 'i-lucide-stethoscope',
-    risk: 'Patient records carry the highest GDPR protection requirements',
-  },
-]
-
-const stats = [
-  {
-    value: '72 hrs',
-    label: 'ICO breach notification window',
-    note: 'The time you have to report a qualifying data breach to the ICO under UK GDPR Articles 33–34',
-  },
-  {
-    value: '£17.5M',
-    label: 'Maximum ICO fine for serious breaches',
-    note: 'Or 4% of global annual turnover — whichever is higher',
-  },
-  {
-    value: '99%',
-    label: 'Small practices with GDPR gaps',
-    note: 'Based on common audit findings — most practices have at least one undocumented processing activity',
+    company: 'CodeTrip',
+    title: 'Founder',
+    dates: 'Aug 2013 – Dec 2014',
+    summary: 'Co-founded a configurable marketplace platform serving travel, luxury fashion, jewellery, and pet supplies clients. Platform acquired by Reebonz Pte Ltd in 2015.',
   },
 ]
 </script>

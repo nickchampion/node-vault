@@ -10,7 +10,7 @@
         <h2>Who We Are</h2>
 
         <p>
-          NodeVault is a UK-based privacy technology company founded on a simple premise: the tools to protect your digital life should be accessible to ordinary people, not just security engineers. We sell pre-configured GrapheneOS smartphones and design self-hosted home network systems built on UmbrelOS — everything set up, hardened, and ready to use from day one.
+          NodeVault is a resource for anyone who wants to take back control of their digital life. We cover three practical paths to better privacy: de-Googling your phone with GrapheneOS, replacing cloud subscriptions with a self-hosted UmbrelOS home server and protecting your home network from IoT surveillance. The tools are free and open source. This site explains how they work and how to get started.
         </p>
 
         <h2>Why We Exist</h2>
@@ -28,45 +28,45 @@
         </p>
 
         <p>
-          That's what NodeVault does.
+          NodeVault is that resource. It's a place to understand the tools, learn what they do, and figure out where to start — without needing a computer science degree or a threat model written by a security researcher.
         </p>
 
-        <h2>What We Offer</h2>
+        <h2>What You'll Find Here</h2>
 
         <ul>
           <li>
-            <strong>GrapheneOS Phones</strong> — Google Pixel devices with GrapheneOS installed and hardened, shipped ready to use. No Google account required. No setup complexity.
+            <strong>De-Google your phone.</strong> A guide to GrapheneOS — what it is, why it matters, how it compares to stock Android and iOS, which hardware it runs on, and what apps to use instead of Google's.
           </li>
 
           <li>
-            <strong>UmbrelOS Home Servers</strong> — Purpose-built home server hardware pre-loaded with UmbrelOS, configured for your network. Replace Dropbox, Google Photos, Spotify and more with apps you own and control.
+            <strong>Own your cloud.</strong> Everything you need to know about self-hosting with UmbrelOS — what you can replace, what hardware you need, and how much it actually costs compared to the subscriptions it replaces.
           </li>
 
           <li>
-            <strong>Consulting for Businesses</strong> — Privacy-first infrastructure for small businesses: GrapheneOS phone fleets, self-hosted productivity tools, and network architecture that keeps your data off third-party servers.
+            <strong>Secure your home network.</strong> How IoT devices behave on a typical home network, why that's a problem, and how DNS-level blocking, WireGuard VPN, and VLAN isolation address it — using open source software on a small piece of hardware.
           </li>
         </ul>
 
-        <h2>Our Principles</h2>
+        <h2>What we believe</h2>
 
         <ul>
-          <li><strong>No compromise on privacy.</strong> We only recommend and sell products we'd use ourselves. We don't partner with vendors who track users.</li>
+          <li><strong>Privacy is a right, not a luxury.</strong> The tools exist. Making them accessible to ordinary people — not just security engineers — is the point.</li>
 
-          <li><strong>Honest advice.</strong> If a tool has a limitation, we'll tell you. We'd rather lose a sale than set a customer up with something that doesn't fit their needs.</li>
+          <li><strong>Honest about trade-offs.</strong> None of these solutions are perfect or frictionless. We'll tell you what doesn't work, what's hard, and where the rough edges are.</li>
 
-          <li><strong>Open source where possible.</strong> GrapheneOS, UmbrelOS, and most of the apps we recommend are open source. You can verify what the software does. So can the global security community.</li>
+          <li><strong>Open source matters.</strong> GrapheneOS, UmbrelOS, Pi-hole, WireGuard — all of it is open source. You can verify what the software does. So can the global security community.</li>
 
-          <li><strong>Long-term support.</strong> We don't disappear after the sale. NodeVault customers have access to support, guidance, and updates as the tools and threat landscape evolve.</li>
+          <li><strong>You don't need to go all-in.</strong> Any one of these three paths is meaningful on its own. Start where it makes sense for you.</li>
         </ul>
 
-        <h2>Get in Touch</h2>
+        <h2>Need a hand?</h2>
 
         <p>
-          If you have questions about any of our products, want advice on which solution is right for you, or are interested in what a business deployment might look like — we'd love to hear from you.
+          If you're trying to figure out where to start, which hardware to buy, or how something works — feel free to get in touch. No sales pitch, no obligation.
         </p>
 
         <p>
-          <NuxtLink to="/company/contact">Send us a message</NuxtLink> and we'll get back to you shortly.
+          <NuxtLink to="/company/contact">Send a message</NuxtLink> and I'll do my best to help.
         </p>
       </div>
     </UPageSection>
@@ -75,10 +75,10 @@
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'About Us | NodeVault',
-  description: 'NodeVault is a UK-based privacy technology company. We sell GrapheneOS phones and UmbrelOS home servers — privacy tools that are actually practical.',
+  title: 'About NodeVault',
+  description: 'NodeVault is a resource covering three paths to better privacy: GrapheneOS phones, self-hosted home servers with UmbrelOS, and home network protection with DNS blocking and VLANs.',
   ogTitle: 'About NodeVault',
-  ogDescription: 'We believe privacy is a right, not a luxury. NodeVault makes practical privacy tools accessible to everyone.',
+  ogDescription: 'A resource for taking back control of your digital life — GrapheneOS, UmbrelOS self-hosting, and home network privacy.',
 })
 </script>
 

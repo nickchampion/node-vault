@@ -1,6 +1,10 @@
 # NodeVault
 
-A privacy-tech platform offering GrapheneOS phones, UmbrelOS self-hosting servers, and security consulting for individuals and small businesses. Built as an NX monorepo with a Node.js API and a Nuxt 4 frontend.
+An NX monorepo containing two frontend applications, a shared REST API, and a set of platform components.
+
+**NodeVault** (`nodevault.cloud`) — a privacy information portal covering three practical paths to reducing your digital footprint: de-Googling your phone with GrapheneOS, replacing cloud subscriptions with a self-hosted UmbrelOS home server, and protecting your home network from IoT surveillance.
+
+**Nick Champion** (`nickchampion.me`) — a personal profile and CV site showcasing engineering background, technical expertise, and project work.
 
 ---
 
@@ -48,7 +52,7 @@ Koa → OpenAPI route match + schema validation
 
 ---
 
-### `apps/nodevault` — Frontend
+### `apps/nodevault` — NodeVault frontend
 
 Nuxt 4 (`compatibilityVersion: 4`) SSR app deployed to Cloudflare Workers via the `cloudflare_module` preset. All pages server-render by default; no prerendering.
 
@@ -57,6 +61,17 @@ Nuxt 4 (`compatibilityVersion: 4`) SSR app deployed to Cloudflare Workers via th
 **Dev server:** `pnpm run app` → `http://www.nodevault.local:9001`
 
 **Deploy:** `pnpm run app:build` → Wrangler → Cloudflare Workers (`nodevault` worker)
+
+#### Content areas
+
+| Section | Path | Description |
+|---------|------|-------------|
+| Privacy Phones | `/phones` | GrapheneOS — de-Googling your phone, compatible devices, privacy app stack |
+| Home Server | `/umbrelos` | UmbrelOS self-hosting — hardware, app directory, replacing cloud subscriptions |
+| Privacy Router | `/privacy-router` | DNS blocking, WireGuard VPN, VLAN isolation for home networks |
+| Blog | `/blog` | Articles and guides |
+| Contact | `/company/contact` | Get in touch form |
+| About | `/company/about` | About NodeVault |
 
 #### Layouts
 
@@ -77,6 +92,34 @@ Email templates are Nuxt pages under `/emails/*` using the `email` layout. The A
 | `app/stores/auth-store.ts` | Pinia store — JWT tokens, expiry, `apiOptions()` |
 | `app/composables/useApiClient.ts` | Returns a typed `NodeVaultApiClient` bound to auth tokens |
 | `app/composables/useConfig.ts` | Runtime config access |
+
+---
+
+### `apps/nickchampion` — Personal profile site
+
+Nuxt 4 SSR app deployed to Cloudflare Workers. Light-only UI (sky/slate colour scheme) with forced light mode — dark mode is disabled at the CSS level regardless of system preference.
+
+**Stack:** Nuxt 4 · Vue 3 · Nuxt UI · Tailwind CSS · TypeScript
+
+**Dev server:** `pnpm run nickchampion` → `http://www.nickchampion.local:9003`
+
+**Deploy:** Cloudflare Workers (`nickchampion` worker)
+
+#### Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page — intro, key strengths, technical expertise, current project, recent roles |
+| `/cv` | Full CV — career history, education, notable achievements |
+| `/nodevault` | NodeVault project showcase — what it is, tech stack, engineering highlights |
+| `/contact` | Contact form — name, email, optional phone, message; posts to `/comms/contact` API endpoint |
+
+#### Notes
+
+- No auth — fully public, no admin section
+- Contact form submits to the same `/comms/contact` API endpoint as NodeVault, with `interests: ['other']` injected silently (required by the shared schema)
+- Uses `PhoneInput` component copied from NodeVault, backed by `Countries` domain model
+- Dark mode disabled: `@variant dark` redefined to `never-dark` in CSS, plus `.dark` CSS variable block overridden to light values in `app/assets/css/main.css`
 
 ---
 
@@ -106,9 +149,10 @@ Email templates are Nuxt pages under `/emails/*` using the `email` layout. The A
 # Install dependencies
 pnpm install
 
-# Start both servers (separate terminals)
+# Start servers (separate terminals)
 pnpm run api          # API on :9002
-pnpm run app          # Nuxt on :9001
+pnpm run app          # NodeVault Nuxt on :9001
+pnpm run nickchampion # Nick Champion Nuxt on :9003
 
 # Type check everything
 npx tsc --noEmit
@@ -130,6 +174,7 @@ Add to `/etc/hosts`:
 ```
 127.0.0.1  api.nodevault.local
 127.0.0.1  www.nodevault.local
+127.0.0.1  www.nickchampion.local
 ```
 
 ### Configuration
@@ -144,3 +189,4 @@ Server config is passed as a base64-encoded JSON string in the `NODEVAULT` envir
 |-----|----------|---------|
 | `apps/api` | Fly.io (Docker, `lhr`) | `fly deploy` from `apps/api/` |
 | `apps/nodevault` | Cloudflare Workers | `pnpm run app:build` then `wrangler deploy` from `apps/nodevault/` |
+| `apps/nickchampion` | Cloudflare Workers | build then `wrangler deploy` from `apps/nickchampion/` |

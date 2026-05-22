@@ -1,37 +1,49 @@
 <template>
-  <header class="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-default">
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-slate-200">
     <UContainer class="flex items-center justify-between gap-4 h-16">
       <NuxtLink
         to="/"
         class="flex items-center gap-2.5 shrink-0">
         <AppLogo class="size-8" />
 
-        <span class="font-semibold text-sm tracking-tight">Nick Champion</span>
+        <span class="font-semibold text-sm tracking-tight text-slate-900">Nick Champion</span>
       </NuxtLink>
 
       <UNavigationMenu
         :items="links"
         variant="link"
-        color="neutral"
+        color="primary"
         class="hidden sm:flex" />
 
       <div class="flex items-center gap-2 shrink-0">
-        <ClientOnly>
-          <UButton
-            :icon="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
-            variant="ghost"
-            color="neutral"
-            aria-label="Toggle colour mode"
-            @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'" />
-        </ClientOnly>
+        <UButton
+          href="https://github.com/nickchampion"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          icon="i-simple-icons-github"
+          aria-label="GitHub"
+          class="hidden sm:flex" />
+
+        <UButton
+          to="/contact"
+          variant="solid"
+          color="primary"
+          size="sm"
+          class="hidden sm:flex"
+          icon="i-lucide-mail">
+          Get in touch
+        </UButton>
 
         <UButton
           class="flex sm:hidden"
           variant="ghost"
-          color="neutral"
+          color="primary"
           :icon="mobileOpen ? 'i-lucide-x' : 'i-lucide-menu'"
           aria-label="Toggle menu"
-          @click="mobileOpen = true" />
+          @click="mobileOpen = !mobileOpen" />
       </div>
     </UContainer>
   </header>
@@ -39,22 +51,22 @@
   <USlideover
     v-model:open="mobileOpen"
     side="right"
-    :ui="{ content: 'w-72' }">
+    :ui="{ content: 'w-64' }">
     <template #content>
       <div class="flex flex-col h-full">
-        <div class="flex items-center justify-between px-4 h-16 border-b border-default shrink-0">
+        <div class="flex items-center justify-between px-4 h-16 border-b border-slate-200 shrink-0">
           <NuxtLink
             to="/"
             class="flex items-center gap-2.5"
             @click="mobileOpen = false">
             <AppLogo class="size-8" />
 
-            <span class="font-semibold text-sm tracking-tight">NodeVault</span>
+            <span class="font-semibold text-sm tracking-tight">Nick Champion</span>
           </NuxtLink>
 
           <UButton
             variant="ghost"
-            color="neutral"
+            color="primary"
             icon="i-lucide-x"
             aria-label="Close menu"
             @click="mobileOpen = false" />
@@ -65,19 +77,19 @@
             :items="links"
             orientation="vertical"
             variant="link"
-            color="neutral"
+            color="primary"
             class="w-full" />
         </div>
 
-        <div class="p-4 border-t border-default shrink-0">
+        <div class="p-4 border-t border-slate-200 shrink-0">
           <UButton
-            to="/auth/login"
+            to="/contact"
             variant="outline"
-            color="neutral"
-            icon="i-lucide-log-in"
+            color="primary"
+            icon="i-lucide-mail"
             class="w-full justify-center"
             @click="mobileOpen = false">
-            Sign in
+            Get in touch
           </UButton>
         </div>
       </div>
@@ -92,7 +104,6 @@ defineProps<{
   links: NavigationMenuItem[]
 }>()
 
-const colorMode = useColorMode()
 const mobileOpen = ref(false)
 const route = useRoute()
 

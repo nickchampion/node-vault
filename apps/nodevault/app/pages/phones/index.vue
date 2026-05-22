@@ -1,119 +1,207 @@
 <template>
   <UPage>
     <UPageHero
-      title="Privacy Phone Installation & Configuration"
-      description="We install GrapheneOS, CalyxOS, or /e/OS on your Android device and configure it for a life without tracking, telemetry, or Big Tech surveillance. Your phone, running software that works for you — not for advertisers."
+      title="Your phone is tracking you. Here's how to stop it."
+      description="Both iOS and Android collect far more data than most people realise — and most of it cannot be turned off through settings. GrapheneOS is a hardened Android operating system that eliminates surveillance at the OS level."
       align="center">
       <template #links>
         <UButton
-          to="/company/contact"
-          size="xl"
-          icon="i-lucide-smartphone">
-          Book Installation
-        </UButton>
-
-        <UButton
-          to="#compatible-devices"
+          to="#what-is-grapheneos"
           size="xl"
           icon="i-lucide-chevron-down"
           variant="outline"
           color="neutral">
-          See Compatible Phones
+          What Is GrapheneOS?
+        </UButton>
+
+        <UButton
+          to="/company/contact"
+          size="xl"
+          icon="i-lucide-message-circle"
+          variant="ghost"
+          color="neutral">
+          Need help getting started?
         </UButton>
       </template>
     </UPageHero>
 
     <UPageSection
-      title="What We Do"
-      description="We take your existing Google Pixel phone — or supply one — and replace the stock Android operating system with a privacy-respecting alternative. Then we configure it from scratch with the apps and settings that give you back control."
+      title="What your phone is actually sending"
+      description="The data collection built into iOS and Android is extensive, largely invisible, and — in most cases — impossible to fully disable through the settings UI."
       align="center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-        <UCard
-          v-for="os in operatingSystems"
-          :key="os.name"
-          class="flex flex-col gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 max-w-5xl mx-auto">
+        <div class="rounded-2xl border border-default bg-muted/20 p-6 space-y-4">
           <div class="flex items-center gap-3">
-            <div class="flex items-center justify-center size-10 rounded-xl bg-primary/10 shrink-0">
+            <div class="flex items-center justify-center size-10 rounded-xl bg-muted shrink-0">
               <UIcon
-                :name="os.icon"
-                class="size-5 text-primary" />
+                name="i-lucide-apple"
+                class="size-5" />
             </div>
 
-            <div>
-              <h3 class="font-semibold">
-                {{ os.name }}
-              </h3>
-
-              <UBadge
-                :color="os.recommended ? 'primary' : 'neutral'"
-                variant="subtle"
-                size="xs">
-                {{ os.recommended ? 'Recommended' : 'Available' }}
-              </UBadge>
-            </div>
+            <h3 class="font-bold text-lg">
+              iOS
+            </h3>
           </div>
 
-          <p class="text-sm text-muted flex-1">
-            {{ os.description }}
+          <p class="text-sm text-muted">
+            Apple's privacy marketing is aggressive, but iOS still collects significant data by default.
           </p>
 
-          <ul class="space-y-1.5">
+          <ul class="space-y-2.5">
             <li
-              v-for="point in os.points"
-              :key="point"
-              class="flex items-start gap-2 text-xs text-muted">
+              v-for="item in iosTracking"
+              :key="item.title"
+              class="flex items-start gap-3 text-sm">
               <UIcon
-                name="i-lucide-check"
-                class="size-3.5 text-primary shrink-0 mt-0.5" />
+                name="i-lucide-alert-circle"
+                class="size-4 text-warning shrink-0 mt-0.5" />
 
-              <span>{{ point }}</span>
+              <div>
+                <p class="font-medium">
+                  {{ item.title }}
+                </p>
+
+                <p class="text-muted text-xs mt-0.5">
+                  {{ item.detail }}
+                </p>
+              </div>
             </li>
           </ul>
-        </UCard>
+        </div>
+
+        <div class="rounded-2xl border border-default bg-muted/20 p-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center size-10 rounded-xl bg-muted shrink-0">
+              <UIcon
+                name="i-lucide-smartphone"
+                class="size-5" />
+            </div>
+
+            <h3 class="font-bold text-lg">
+              Stock Android
+            </h3>
+          </div>
+
+          <p class="text-sm text-muted">
+            Google's business model is advertising. Android is the data collection tool.
+          </p>
+
+          <ul class="space-y-2.5">
+            <li
+              v-for="item in androidTracking"
+              :key="item.title"
+              class="flex items-start gap-3 text-sm">
+              <UIcon
+                name="i-lucide-alert-circle"
+                class="size-4 text-error shrink-0 mt-0.5" />
+
+              <div>
+                <p class="font-medium">
+                  {{ item.title }}
+                </p>
+
+                <p class="text-muted text-xs mt-0.5">
+                  {{ item.detail }}
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
+
+      <UCallout
+        class="mt-8 max-w-3xl mx-auto text-left"
+        icon="i-lucide-info"
+        color="neutral">
+        A 2018 study by Douglas Leith at Trinity College Dublin found that Google Android sends approximately 20 times more data to Google than iOS sends to Apple. A 2021 follow-up by the same researcher found both platforms send device identifiers even when users have opted out of tracking.
+      </UCallout>
     </UPageSection>
 
     <UPageSection
-      title="What's Included"
-      description="Every installation includes setup, app configuration, and a walkthrough so you know how to use your phone confidently from day one."
+      id="what-is-grapheneos"
+      title="How GrapheneOS addresses this"
+      description="GrapheneOS is a hardened, privacy-respecting Android operating system built and maintained by independent security researchers. It eliminates the surveillance layer that Google bakes into Android — without sacrificing security or usability."
       align="center">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-        <div
-          v-for="item in included"
-          :key="item.title"
-          class="flex items-start gap-3 p-4 rounded-xl border border-default bg-muted/20">
-          <div class="flex items-center justify-center size-8 rounded-lg bg-primary/10 shrink-0">
-            <UIcon
-              :name="item.icon"
-              class="size-4 text-primary" />
-          </div>
+      <UPageGrid>
+        <UPageCard
+          v-for="feature in grapheneFeatures"
+          :key="feature.title"
+          :title="feature.title"
+          :description="feature.description"
+          :icon="feature.icon" />
+      </UPageGrid>
+    </UPageSection>
 
-          <div>
-            <p class="font-medium text-sm">
-              {{ item.title }}
-            </p>
+    <UPageSection
+      title="GrapheneOS vs. the alternatives"
+      description="There are several de-Googled Android projects. GrapheneOS stands apart because it doesn't compromise on security to achieve privacy."
+      align="center">
+      <div class="overflow-x-auto mt-4 max-w-4xl mx-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-default text-left">
+              <th class="pb-3 font-semibold pr-4" />
+              <th class="pb-3 font-semibold pr-4">
+                GrapheneOS
+              </th>
 
-            <p class="text-xs text-muted mt-0.5">
-              {{ item.description }}
-            </p>
-          </div>
-        </div>
+              <th class="pb-3 font-semibold pr-4">
+                CalyxOS
+              </th>
+
+              <th class="pb-3 font-semibold pr-4">
+                /e/OS
+              </th>
+
+              <th class="pb-3 font-semibold">
+                Stock Android
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-default">
+            <tr
+              v-for="row in comparison"
+              :key="row.feature">
+              <td class="py-3 font-medium pr-4 text-xs text-muted">
+                {{ row.feature }}
+              </td>
+
+              <td
+                v-for="(value, idx) in row.values"
+                :key="idx"
+                class="py-3 pr-4">
+                <UIcon
+                  v-if="value === true"
+                  name="i-lucide-check-circle"
+                  class="size-4 text-success" />
+
+                <UIcon
+                  v-else-if="value === false"
+                  name="i-lucide-x-circle"
+                  class="size-4 text-error" />
+
+                <span
+                  v-else
+                  class="text-xs text-muted">{{ value }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </UPageSection>
 
     <UPageSection
       id="compatible-devices"
-      title="Compatible Devices"
-      description="We work exclusively with Google Pixel devices. Pixel hardware is the only platform that allows the bootloader to be relocked after installing a custom OS — this is critical for verified boot and proper hardware security."
+      title="Compatible devices"
+      description="GrapheneOS runs exclusively on Google Pixel phones. Pixel is the only hardware that allows the bootloader to be relocked after installing a custom OS — this is critical for verified boot and the hardware security chain."
       align="center">
-      <div class="overflow-x-auto mt-4">
+      <div class="overflow-x-auto mt-4 max-w-3xl mx-auto">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-default text-left">
               <th class="pb-3 font-semibold">Device</th>
               <th class="pb-3 font-semibold">GrapheneOS</th>
-              <th class="pb-3 font-semibold">CalyxOS</th>
-              <th class="pb-3 font-semibold">/e/OS</th>
               <th class="pb-3 font-semibold">Notes</th>
             </tr>
           </thead>
@@ -121,31 +209,15 @@
           <tbody class="divide-y divide-default">
             <tr
               v-for="device in devices"
-              :key="device.model"
-              class="py-3">
+              :key="device.model">
               <td class="py-3 font-medium">
                 {{ device.model }}
               </td>
 
               <td class="py-3">
                 <UIcon
-                  :name="device.graphene ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
-                  :class="device.graphene ? 'text-success' : 'text-muted'"
-                  class="size-4" />
-              </td>
-
-              <td class="py-3">
-                <UIcon
-                  :name="device.calyx ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
-                  :class="device.calyx ? 'text-success' : 'text-muted'"
-                  class="size-4" />
-              </td>
-
-              <td class="py-3">
-                <UIcon
-                  :name="device.eos ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
-                  :class="device.eos ? 'text-success' : 'text-muted'"
-                  class="size-4" />
+                  name="i-lucide-check-circle"
+                  class="size-4 text-success" />
               </td>
 
               <td class="py-3 text-muted text-xs">
@@ -157,16 +229,16 @@
       </div>
 
       <UCallout
-        class="mt-6 text-left"
+        class="mt-6 text-left max-w-3xl mx-auto"
         icon="i-lucide-info"
         color="neutral">
-        Don't have a compatible phone? We can supply a refurbished Pixel 8 or 9 — just mention it when you contact us.
+        The official GrapheneOS installation guide at grapheneos.org is thorough and works with any Chromium-based browser. Most technically comfortable users can complete a fresh install in under an hour.
       </UCallout>
     </UPageSection>
 
     <UPageSection
-      title="Privacy App Stack"
-      description="After the OS install we configure a curated set of privacy-respecting apps. You choose what gets installed — this is a starting point, not a prescription."
+      title="Privacy app stack"
+      description="Once GrapheneOS is running, replacing the Google apps you rely on is the next step. These are the most widely used privacy-respecting alternatives."
       align="center">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         <div
@@ -199,60 +271,7 @@
     </UPageSection>
 
     <UPageSection
-      id="pricing"
-      title="Pricing"
-      align="center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 max-w-3xl mx-auto">
-        <UCard
-          v-for="plan in pricing"
-          :key="plan.name"
-          class="flex flex-col gap-4">
-          <div>
-            <h3 class="font-semibold text-lg">
-              {{ plan.name }}
-            </h3>
-
-            <p class="text-3xl font-bold mt-1">
-              {{ plan.price }}
-            </p>
-
-            <p class="text-sm text-muted mt-1">
-              {{ plan.description }}
-            </p>
-          </div>
-
-          <ul class="space-y-2 flex-1">
-            <li
-              v-for="feature in plan.features"
-              :key="feature"
-              class="flex items-start gap-2 text-sm">
-              <UIcon
-                name="i-lucide-check-circle"
-                class="size-4 text-primary shrink-0 mt-0.5" />
-
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
-
-          <UButton
-            to="/company/contact"
-            variant="outline"
-            color="neutral"
-            icon="i-lucide-arrow-right"
-            trailing
-            block>
-            Book This Service
-          </UButton>
-        </UCard>
-      </div>
-
-      <p class="text-sm text-muted text-center mt-6">
-        Send-in or drop-off service. Turnaround 1–2 business days. Postal return covered for send-in orders.
-      </p>
-    </UPageSection>
-
-    <UPageSection
-      title="Who This Is For"
+      title="Who this is for"
       align="center">
       <UPageGrid>
         <UPageCard
@@ -267,23 +286,25 @@
     <UPageSection align="center">
       <UCard class="max-w-2xl mx-auto text-center p-8 space-y-4">
         <UIcon
-          name="i-lucide-smartphone"
+          name="i-lucide-message-circle"
           class="size-10 text-primary mx-auto" />
 
         <h2 class="text-2xl font-bold">
-          Ready to take back your phone?
+          Want some guidance?
         </h2>
 
         <p class="text-muted">
-          Get in touch with the device model you have (or ask about supply) and which OS you're interested in. We'll confirm availability and turnaround.
+          If you're thinking about installing GrapheneOS and would like some guidance — on which device to get, how the installation process works, or how to migrate your apps — feel free to get in touch. Happy to help.
         </p>
 
         <UButton
           to="/company/contact"
           size="xl"
+          variant="outline"
+          color="neutral"
           icon="i-lucide-arrow-right"
           trailing>
-          Book an Installation
+          Get in touch
         </UButton>
       </UCard>
     </UPageSection>
@@ -292,94 +313,131 @@
 
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Privacy Phone Installation — GrapheneOS, CalyxOS & /e/OS | NodeVault',
-  description: 'Professional GrapheneOS, CalyxOS, and /e/OS installation service for Google Pixel phones. Privacy app configuration included. UK-based send-in or drop-off service.',
-  ogTitle: 'Privacy Phone Installation — GrapheneOS, CalyxOS & /e/OS | NodeVault',
-  ogDescription: 'We install and configure a privacy OS on your Pixel phone and set up everything you need to leave Google behind.',
+  title: 'De-Google Your Phone with GrapheneOS | NodeVault',
+  description: 'iOS and Android track more than most people realise. GrapheneOS removes surveillance at the OS level — no telemetry, sandboxed Play, and granular permission controls. Here\'s how.',
+  ogTitle: 'De-Google Your Phone with GrapheneOS | NodeVault',
+  ogDescription: 'Learn how GrapheneOS eliminates tracking from your Android phone at the OS level. Compatible devices, app stack, and installation guidance.',
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  keywords: 'GrapheneOS installation UK, CalyxOS install, privacy phone UK, de-googled phone, GrapheneOS Pixel, privacy Android UK',
+  keywords: 'GrapheneOS guide, de-google phone, privacy phone, GrapheneOS install, GrapheneOS Pixel, remove Google from Android',
 })
 
-const operatingSystems = [
+const iosTracking = [
   {
-    name: 'GrapheneOS',
-    icon: 'i-lucide-shield',
-    recommended: true,
-    description: 'The gold standard in Android privacy. GrapheneOS is a hardened Android fork built by security researchers. It eliminates all Google services at the OS level while remaining compatible with the apps you need via sandboxed Google Play.',
-    points: [
-      'No telemetry or background tracking',
-      'Sandboxed Google Play — run apps without giving Google OS access',
-      'Hardware-level verified boot after install',
-      'Regular security updates on the same schedule as stock Android',
-      'Supported on Pixel 6 through Pixel 9 series',
-    ],
+    title: 'Device analytics shared with Apple and partners',
+    detail: 'Enabled by default. Covers usage patterns, crash logs, app interactions, and Siri query content.',
   },
   {
-    name: 'CalyxOS',
-    icon: 'i-lucide-shield-check',
-    recommended: false,
-    description: 'A community-focused privacy OS with MicroG support built in. Easier for users transitioning from stock Android who need more app compatibility out of the box — Google services are replaced with open-source alternatives rather than sandboxed.',
-    points: [
-      'MicroG for Google-dependent app compatibility',
-      'F-Droid and Aurora Store pre-configured',
-      'Mozilla Location Services replaces Google location',
-      'Supported on Pixel 6 through Pixel 8 series',
-    ],
+    title: 'iCloud backups scanned for CSAM — and more',
+    detail: 'Apple scans iCloud Photo Library contents on-device before upload. The same infrastructure could be applied to other content categories.',
   },
   {
-    name: '/e/OS',
-    icon: 'i-lucide-shield-off',
-    recommended: false,
-    description: 'The most user-friendly option. /e/OS is designed for people who want a completely de-Googled experience with a familiar UI. Comes with a suite of cloud services (Murena Cloud) and strong app compatibility. Best for non-technical users.',
-    points: [
-      'Murena Cloud: calendar, contacts, mail sync',
-      'Familiar interface close to stock Android',
-      'App Lounge for accessing Play Store apps without a Google account',
-      'Supported on a wider range of devices than GrapheneOS',
-    ],
+    title: 'Precise location shared for "personalised ads"',
+    detail: 'iOS shares location data with Apple\'s advertising platform. Disabling this requires navigating multiple settings screens and doesn\'t cover all data flows.',
+  },
+  {
+    title: 'Siri processes queries on Apple servers',
+    detail: 'Even with "improve Siri" disabled, voice queries are processed server-side. Audio snippets are retained for a period.',
+  },
+  {
+    title: 'App Store purchase and browsing history retained',
+    detail: 'Apple retains your full App Store history and associates it with your Apple ID indefinitely.',
   },
 ]
 
-const included = [
+const androidTracking = [
   {
-    title: 'OS Installation',
-    icon: 'i-lucide-download',
-    description: 'Full custom OS install with bootloader relocked and verified boot confirmed.',
+    title: 'OS-level telemetry to Google every few minutes',
+    detail: 'Research by Trinity College Dublin found stock Android pings Google servers regularly even with no apps running, sharing location, hardware IDs, and network data.',
   },
   {
-    title: 'App Configuration',
-    icon: 'i-lucide-layout-grid',
-    description: 'Privacy app stack installed and configured to your preferences.',
+    title: 'Google Play Services runs with system-level privileges',
+    detail: 'Google Play Services cannot be removed on stock Android. It has access to your contacts, location, app data, and device identifiers — always.',
   },
   {
-    title: 'Secure Messaging',
-    icon: 'i-lucide-message-circle',
-    description: 'Signal, Session, or SimpleX set up and ready — you choose your preferred app.',
+    title: 'Location history even when "off"',
+    detail: 'Google was found to record location even when users had disabled Location History, using Wi-Fi scan data and Cell ID lookups as proxies.',
   },
   {
-    title: 'Browser Setup',
-    icon: 'i-lucide-globe',
-    description: 'Brave or Firefox with hardened settings, privacy-respecting search engine configured.',
+    title: 'All search, maps, and Assistant queries retained',
+    detail: 'Every query across Google apps is logged and associated with your Google account. This includes voice queries to Google Assistant.',
   },
   {
-    title: 'Permission Lockdown',
-    icon: 'i-lucide-lock',
-    description: 'Microphone, camera, location, and network access reviewed and restricted by default.',
+    title: 'Ad ID tracks you across every app',
+    detail: 'Android assigns a persistent advertising identifier that follows you across every app. "Resetting" it creates a new ID but doesn\'t delete the history associated with the old one.',
   },
   {
-    title: 'Walkthrough Included',
-    icon: 'i-lucide-book-open',
-    description: 'Written guide or video call walkthrough so you\'re confident using your new setup.',
+    title: 'Manufacturer and carrier bloatware with own telemetry',
+    detail: 'Samsung, OnePlus, and carrier-branded phones ship with additional apps that run their own telemetry independently of Google.',
+  },
+]
+
+const grapheneFeatures = [
+  {
+    title: 'No Telemetry at the OS Level',
+    description: 'GrapheneOS contains no Google services and no background data collection. Nothing phones home — because there is nothing to phone home to.',
+    icon: 'i-lucide-eye-off',
+  },
+  {
+    title: 'Sandboxed Google Play',
+    description: 'Need Play Store apps? GrapheneOS lets you run Google Play in an isolated sandbox with no system-level privileges. Apps work normally; Google can\'t see your OS or other apps.',
+    icon: 'i-lucide-box',
+  },
+  {
+    title: 'Verified Boot Preserved',
+    description: 'Unlike most custom ROMs, GrapheneOS supports relocking the bootloader after installation. Your phone passes hardware attestation and maintains the full security chain.',
+    icon: 'i-lucide-shield-check',
+  },
+  {
+    title: 'Monthly Security Updates',
+    description: 'GrapheneOS ships security patches on the same schedule as stock Android. You get OS-level privacy without falling behind on security fixes.',
+    icon: 'i-lucide-refresh-cw',
+  },
+  {
+    title: 'Hardened Permission Model',
+    description: 'Grant apps access to spoofed location data, restrict network access per-app, disable sensor access for untrusted apps. Far beyond what stock Android allows.',
+    icon: 'i-lucide-sliders-horizontal',
+  },
+  {
+    title: 'Fully Open Source',
+    description: 'Every line of code is publicly auditable. No corporate interests, no monetisation model, no hidden services. Maintained by independent security researchers.',
+    icon: 'i-lucide-code',
+  },
+]
+
+const comparison = [
+  {
+    feature: 'No Google services by default',
+    values: [true, true, true, false],
+  },
+  {
+    feature: 'Bootloader can be relocked',
+    values: [true, false, false, true],
+  },
+  {
+    feature: 'Monthly security patches',
+    values: [true, true, 'Delayed', true],
+  },
+  {
+    feature: 'Sandboxed Play Store available',
+    values: [true, 'MicroG', 'MicroG', 'N/A'],
+  },
+  {
+    feature: 'Pixel 8 / 9 support',
+    values: [true, true, false, true],
+  },
+  {
+    feature: 'Hardware attestation passes',
+    values: [true, false, false, true],
   },
 ]
 
 const devices = [
-  { model: 'Pixel 6 / 6a / 6 Pro', graphene: true, calyx: true, eos: true, notes: 'Supported, approaching end of update lifecycle' },
-  { model: 'Pixel 7 / 7a / 7 Pro', graphene: true, calyx: true, eos: true, notes: 'Fully supported, recommended budget option' },
-  { model: 'Pixel 8 / 8a / 8 Pro', graphene: true, calyx: true, eos: true, notes: 'Recommended — longest remaining update window' },
-  { model: 'Pixel 9 / 9 Pro / 9 Pro XL', graphene: true, calyx: false, eos: false, notes: 'GrapheneOS only — newest hardware' },
-  { model: 'Pixel 9 Pro Fold', graphene: true, calyx: false, eos: false, notes: 'GrapheneOS only' },
+  { model: 'Pixel 6 / 6a / 6 Pro', notes: 'Supported — approaching end of update lifecycle, good budget option' },
+  { model: 'Pixel 7 / 7a / 7 Pro', notes: 'Fully supported — solid mid-range option with a good remaining update window' },
+  { model: 'Pixel 8 / 8a / 8 Pro', notes: 'Recommended — longest remaining update window at time of writing' },
+  { model: 'Pixel 9 / 9 Pro / 9 Pro XL', notes: 'Latest hardware — best performance and longest future support' },
+  { model: 'Pixel 9 Pro Fold', notes: 'Supported — for those who want a foldable form factor' },
 ]
 
 const appStack = [
@@ -389,15 +447,15 @@ const appStack = [
     apps: [
       { name: 'Signal', replaces: 'WhatsApp / iMessage' },
       { name: 'SimpleX Chat', replaces: 'WhatsApp / Telegram' },
-      { name: 'Tutanota or Proton Mail', replaces: 'Gmail / Outlook' },
+      { name: 'Proton Mail', replaces: 'Gmail / Outlook' },
     ],
   },
   {
     category: 'Browsing',
     icon: 'i-lucide-globe',
     apps: [
+      { name: 'Vanadium', replaces: 'Chrome (built into GrapheneOS)' },
       { name: 'Brave', replaces: 'Chrome / Firefox default' },
-      { name: 'Mullvad Browser', replaces: 'Chrome' },
       { name: 'DuckDuckGo', replaces: 'Google Search' },
     ],
   },
@@ -421,55 +479,26 @@ const appStack = [
   },
 ]
 
-const pricing = [
-  {
-    name: 'Installation Only',
-    price: '£200',
-    description: 'Bring your own Pixel 6–9. We install the OS and hand it back.',
-    features: [
-      'OS installation of your choice',
-      'Bootloader relocked, verified boot confirmed',
-      'Base app configuration (browser, messaging)',
-      'Written setup guide',
-      'Send-in or drop-off',
-    ],
-  },
-  {
-    name: 'Full Configuration',
-    price: '£350',
-    description: 'Complete install, app setup, and a personalised walkthrough.',
-    features: [
-      'Everything in Installation Only',
-      'Full privacy app stack installed',
-      'Permission audit and lockdown',
-      'Secure messaging configured',
-      'Cloud storage integration (Nextcloud)',
-      '30-minute video call walkthrough',
-      '30 days email support',
-    ],
-  },
-]
-
 const audiences = [
   {
-    title: 'Journalists & Activists',
-    description: 'Source protection and operational security depend on secure devices. A de-Googled phone removes a significant attack surface and eliminates the risk of OS-level data collection.',
-    icon: 'i-lucide-pen-line',
-  },
-  {
-    title: 'Legal & Healthcare Professionals',
-    description: 'Client confidentiality extends to the tools you use. A phone that reports your location and contacts to Google creates GDPR processing you have not documented or consented to.',
-    icon: 'i-lucide-briefcase',
-  },
-  {
-    title: 'Privacy-Conscious Individuals',
-    description: 'You don\'t need a threat model to want your phone to stop tracking you. GrapheneOS gives you a normal Android experience without the surveillance layer baked in by the manufacturer.',
+    title: 'Privacy-conscious individuals',
+    description: 'You don\'t need a threat model to want your phone to stop tracking you. GrapheneOS gives you a normal Android experience without the surveillance layer baked in by Google.',
     icon: 'i-lucide-user',
   },
   {
-    title: 'Business Owners & Executives',
-    description: 'Sensitive business discussions, financial data, and client relationships all pass through your phone. Reducing the attack surface reduces your exposure.',
-    icon: 'i-lucide-building-2',
+    title: 'Journalists & activists',
+    description: 'Source protection and operational security depend on secure, uncompromised devices. GrapheneOS removes OS-level telemetry and significantly narrows the attack surface.',
+    icon: 'i-lucide-pen-line',
+  },
+  {
+    title: 'Healthcare & legal professionals',
+    description: 'Client confidentiality extends to the tools you use. A phone that reports your location and contacts to Google is a liability. GrapheneOS eliminates that risk.',
+    icon: 'i-lucide-briefcase',
+  },
+  {
+    title: 'Anyone curious about digital sovereignty',
+    description: 'Your phone knows where you sleep, who you talk to, what you search for, and what you buy. That data belongs to you — not to an advertising platform.',
+    icon: 'i-lucide-heart',
   },
 ]
 </script>

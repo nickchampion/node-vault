@@ -19,28 +19,25 @@ const navLinks: NavigationMenuItem[] = [
     to: '/phones',
     children: [
       {
-        label: 'Phone Hardening Service', description: 'GrapheneOS, CalyxOS & /e/OS installation', to: '/phones', icon: 'i-lucide-smartphone',
+        label: 'De-Google Your Phone', description: 'Why GrapheneOS and how to get started', to: '/phones', icon: 'i-lucide-smartphone',
       },
       {
-        label: 'Compatible Devices', description: 'Phones we work with and recommend', to: '/phones/devices', icon: 'i-lucide-list',
+        label: 'Compatible Devices', description: 'Which Google Pixel models work with GrapheneOS', to: '/phones/devices', icon: 'i-lucide-list',
       },
       {
-        label: 'Privacy App Stack', description: 'What gets installed and configured', to: '/phones/software', icon: 'i-lucide-layout-grid',
+        label: 'Privacy App Stack', description: 'Privacy-respecting alternatives to Google apps', to: '/phones/software', icon: 'i-lucide-layout-grid',
       },
     ],
   },
   {
-    label: 'Home Network',
+    label: 'Home Server',
     to: '/umbrelos',
     children: [
       {
-        label: 'Self-Hosting Overview', description: 'Replace Big Tech with apps you own', to: '/umbrelos', icon: 'i-lucide-server',
+        label: 'Own Your Cloud', description: 'Self-host with UmbrelOS — replace cloud subscriptions with your own server', to: '/umbrelos', icon: 'i-lucide-server',
       },
       {
-        label: 'Consulting', description: 'Expert setup for your home network', to: '/umbrelos/consulting', icon: 'i-lucide-wrench',
-      },
-      {
-        label: 'App Directory', description: 'Self-hosted app reviews and guides', to: '/umbrelos/apps', icon: 'i-lucide-layout-grid',
+        label: 'App Directory', description: 'Self-hosted apps and what they replace', to: '/umbrelos/apps', icon: 'i-lucide-layout-grid',
       },
     ],
   },
@@ -49,28 +46,14 @@ const navLinks: NavigationMenuItem[] = [
     to: '/privacy-router',
     children: [
       {
-        label: 'What Is Privacy Router?', description: 'Whole-network privacy in one appliance', to: '/privacy-router', icon: 'i-lucide-box',
+        label: 'Protect Your Network', description: 'Block tracking and isolate IoT devices', to: '/privacy-router', icon: 'i-lucide-box',
       },
       {
-        label: 'How It Works', description: 'DNS blocking, VPN, VLAN isolation', to: '/privacy-router#how-it-works', icon: 'i-lucide-cpu',
-      },
-      {
-        label: 'Pricing & Options', description: 'Home and office hardware bundles', to: '/privacy-router#pricing', icon: 'i-lucide-tag',
+        label: 'How It Works', description: 'DNS blocking, WireGuard VPN, and VLAN isolation', to: '/privacy-router#how-it-works', icon: 'i-lucide-cpu',
       },
     ],
   },
-  {
-    label: 'For Business',
-    to: '/business',
-    children: [
-      {
-        label: 'Privacy Audit', description: 'Find and fix your data exposure', to: '/business', icon: 'i-lucide-search',
-      },
-      {
-        label: 'GDPR Guide', description: 'Your legal obligations explained plainly', to: '/gdpr', icon: 'i-lucide-scroll-text',
-      },
-    ],
-  },
-  { label: 'Contact', to: '/company/contact' },
+  { label: 'Blog', to: '/blog' },
+  { label: 'Get in Touch', to: '/company/contact' },
 ]
 </script>

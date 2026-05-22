@@ -7,7 +7,19 @@
     </template>
 
     <template #right>
-      <AppLogo class="size-8" />
+      <div class="flex items-center gap-3">
+        <UButton
+          href="https://github.com/nickchampion"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          icon="i-simple-icons-github"
+          aria-label="GitHub" />
+
+        <AppLogo class="size-8" />
+      </div>
     </template>
   </UFooter>
 </template>
