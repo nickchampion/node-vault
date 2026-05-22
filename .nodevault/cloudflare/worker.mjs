@@ -36,68 +36,67 @@ const isAllowedOrigin = (origin) => {
 
 const exposeHeaders = 'cf-lat,cf-lon,cf-country,cf-timezone,content-type,accept-version,cache-control,x-elapsed,x-version'
 
-export default async function fetch(request, environment, context) {
-  const url = new URL(request.url)
+export default {
+  async fetch(request, environment, context) {
+    const url = new URL(request.url)
 
-  // Handle API requests in the same worker as our Nuxt app is served from
-  if (url.pathname.startsWith('/api/')) {
-    context.passThroughOnException()
+    if (url.pathname.startsWith('/api/')) {
+      context.passThroughOnException()
 
-    const origin = request.headers.get('Origin') || ''
+      const origin = request.headers.get('Origin') || ''
 
-    const corsOrigin = isAllowedOrigin(origin)
-      ? origin
-      : 'https://www.nodevault.com'
+      const corsOrigin = isAllowedOrigin(origin)
+        ? origin
+        : 'https://www.nodevault.cloud'
 
-    if (request.method.toUpperCase() === 'OPTIONS') {
-      return new Response(undefined, {
-        status: 204,
-        headers: {
-          'Access-Control-Allow-Origin': corsOrigin,
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Headers': '*',
-          'Access-Control-Expose-Headers': exposeHeaders,
-          'Vary': 'Origin',
-        },
+      if (request.method.toUpperCase() === 'OPTIONS') {
+        return new Response(undefined, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': corsOrigin,
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Expose-Headers': exposeHeaders,
+            'Vary': 'Origin',
+          },
+        })
+      }
+
+      const upstreamPath = url.pathname.replace(/^\/api/, '')
+      const endpoint = `https://api.nodevault.cloud${upstreamPath}${url.search}`
+      const headers = new Headers(request.headers)
+
+      headers.delete('cookie')
+      headers.delete('host')
+      headers.delete('content-length')
+
+      const upstream = await fetch(endpoint, {
+        method: request.method,
+        headers,
+        body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
+      })
+
+      const responseHeaders = new Headers(upstream.headers)
+
+      if (request.cf) {
+        if (request.cf.latitude) responseHeaders.set('Cf-Lat', request.cf.latitude.toString())
+        if (request.cf.longitude) responseHeaders.set('Cf-Lon', request.cf.longitude.toString())
+        if (request.cf.country) responseHeaders.set('Cf-Country', request.cf.country)
+        if (request.cf.timezone) responseHeaders.set('Cf-Timezone', request.cf.timezone)
+      }
+
+      responseHeaders.set('Access-Control-Allow-Origin', corsOrigin)
+      responseHeaders.set('Access-Control-Allow-Methods', '*')
+      responseHeaders.set('Access-Control-Allow-Headers', '*')
+      responseHeaders.set('Access-Control-Expose-Headers', exposeHeaders)
+      responseHeaders.set('Vary', 'Origin')
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        headers: responseHeaders,
       })
     }
 
-    const upstreamPath = url.pathname.replace(/^\/api/, '')
-    const endpoint = `https://api.nodevault.cloud${upstreamPath}${url.search}`
-    const headers = new Headers(request.headers)
-
-    headers.delete('cookie')
-    headers.delete('host')
-    headers.delete('content-length')
-
-    const upstream = await fetch(endpoint, {
-      method: request.method,
-      headers,
-      body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
-    })
-
-    const responseHeaders = new Headers(upstream.headers)
-
-    // Add Cloudflare location headers
-    if (request.cf) {
-      if (request.cf.latitude) responseHeaders.set('Cf-Lat', request.cf.latitude.toString())
-      if (request.cf.longitude) responseHeaders.set('Cf-Lon', request.cf.longitude.toString())
-      if (request.cf.country) responseHeaders.set('Cf-Country', request.cf.country)
-      if (request.cf.timezone) responseHeaders.set('Cf-Timezone', request.cf.timezone)
-    }
-
-    responseHeaders.set('Access-Control-Allow-Origin', corsOrigin)
-    responseHeaders.set('Access-Control-Allow-Methods', '*')
-    responseHeaders.set('Access-Control-Allow-Headers', '*')
-    responseHeaders.set('Access-Control-Expose-Headers', exposeHeaders)
-    responseHeaders.set('Vary', 'Origin')
-
-    return new Response(upstream.body, {
-      status: upstream.status,
-      headers: responseHeaders,
-    })
-  }
-
-  // Otherwise, fall back to Nuxt SSR Worker
-  return worker.default.fetch(request, environment, context)
+    return worker.default.fetch(request, environment, context)
+  },
 }

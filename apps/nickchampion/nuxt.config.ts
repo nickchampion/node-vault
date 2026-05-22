@@ -9,7 +9,7 @@ export default defineNuxtConfig(<NuxtConfig>{
     compatibilityVersion: 4,
   },
 
-  ssr: false,
+  ssr: true,
 
   imports: {
     autoImport: true,
