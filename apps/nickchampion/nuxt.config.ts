@@ -31,7 +31,6 @@ export default defineNuxtConfig(<NuxtConfig>{
       '/**': { prerender: false },
     },
     preset: 'cloudflare_module',
-    node_compat: true,
     esbuild: {
       target: 'es2022',
     },
