@@ -7,4 +7,4 @@ COPY .output/ ./
 
 EXPOSE 9002
 
-CMD ["node", "index.js"]
+CMD ["node", "--enable-source-maps", "index.js"]

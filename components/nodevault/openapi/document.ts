@@ -19,8 +19,9 @@ export const composeOpenApiDocument = (): OpenAPIV3.Document => {
     security: [],
     tags: [
       { name: 'Account', description: 'Account and user management' },
-      { name: 'Comms', description: 'Contact and communication' },
       { name: 'Auth', description: 'Authorisation & Registration' },
+      { name: 'Comms', description: 'Contact and communication' },
+      { name: 'System', description: 'Health checks and monitoring' },
     ],
     components: {
       responses: openapi.responses.apiResponses,
@@ -46,6 +47,7 @@ export const composeOpenApiDocument = (): OpenAPIV3.Document => {
     paths: {
       ...paths.auth,
       ...paths.comms,
+      ...paths.system,
     },
   }
 
