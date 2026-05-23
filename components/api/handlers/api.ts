@@ -285,7 +285,7 @@ export class Api {
       }
 
       koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
-      koa.set('x-api-version', this.settings.version)
+      koa.set('x-api-version', this.settings.version ?? '1.0.0')
     }
   }
 
@@ -320,7 +320,7 @@ export class Api {
       koa.set('vary', 'Origin')
     }
 
-    koa.set('x-api-version', this.settings.version)
+    koa.set('x-api-version', this.settings.version ?? '1.0.0')
     koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
 
     Object.keys(context.event.response.headers).forEach((header) => {

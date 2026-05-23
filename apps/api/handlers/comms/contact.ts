@@ -21,7 +21,7 @@ export const commsContact: ApiHandler = async (context): Promise<Response> => {
   const client = createHttpClient(serverConfiguration.ntfy.host)
 
   try {
-    await client.post(serverConfiguration.ntfy.topics.phone, contact, {
+    await client.post(`/${serverConfiguration.ntfy.topics.phone}`, contact, {
       headers: {
         Authorization: base64Encode(`${serverConfiguration.ntfy.username}:${serverConfiguration.ntfy.password}`),
       },
