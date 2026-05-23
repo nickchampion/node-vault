@@ -82,7 +82,6 @@ export interface ApiRequestOptions {
 
 export interface ApiOptions {
   baseUri: string
-  impersonation?: string | null
   tokens?: AuthTokens
   reauth?: () => Promise<ApiOptions>
   device: string

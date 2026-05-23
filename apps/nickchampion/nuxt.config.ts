@@ -109,7 +109,7 @@ export default defineNuxtConfig(<NuxtConfig>{
         },
       ],
       link: [
-        { rel: 'icon', type: 'image/jpeg', href: '/favicon.jpeg' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       ],
     },
   },

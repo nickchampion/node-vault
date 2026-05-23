@@ -62,7 +62,7 @@ export class Api {
       'x-elapsed',
       'x-api-version',
     ],
-    allowOrigin: '',
+    allowOrigins: [] as string[],
     version: '',
     environment: 'dev',
   }
@@ -70,16 +70,26 @@ export class Api {
   constructor(
     options: ApiOptions,
     api: IApiManifest,
-    origin: string,
+    origins: string[],
     version: string,
     environment: string,
   ) {
     this.options = options
     this.middleware = []
     this.api = buildApiDefinitions(api)
-    this.settings.allowOrigin = origin
+    this.settings.allowOrigins = origins
     this.settings.version = version
     this.settings.environment = environment
+  }
+
+  // Access-Control-Allow-Origin must be a single value. Reflect the request
+  // Origin back only if it appears in the allowlist; undefined otherwise.
+  private resolveOrigin(koa: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>): string | undefined {
+    const origin = koa.get('origin')
+
+    if (!origin) return undefined
+
+    return this.settings.allowOrigins.find(o => o === origin)
   }
 
   /**
@@ -156,9 +166,16 @@ export class Api {
    * @returns
    */
   cors = (koa: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>) => {
+    const origin = this.resolveOrigin(koa)
+
     koa.status = 204
-    koa.set('access-control-allow-origin', this.settings.allowOrigin)
-    koa.set('access-control-allow-credentials', 'true')
+
+    if (origin) {
+      koa.set('access-control-allow-origin', origin)
+      koa.set('access-control-allow-credentials', 'true')
+      koa.set('vary', 'Origin')
+    }
+
     koa.set('access-control-allow-methods', this.settings.methods)
     koa.set('access-control-allow-headers', this.settings.headers.join(','))
     koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
@@ -257,9 +274,16 @@ export class Api {
         }
       }
     } catch (error: any) {
+      const origin = this.resolveOrigin(koa)
+
       koa.body = new Response().error(error).body
       koa.status = 500
-      koa.set('access-control-allow-origin', this.settings.allowOrigin)
+
+      if (origin) {
+        koa.set('access-control-allow-origin', origin)
+        koa.set('vary', 'Origin')
+      }
+
       koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
       koa.set('x-api-version', this.settings.version)
     }
@@ -289,7 +313,13 @@ export class Api {
     await middy(context, base, this.middleware)
 
     // set response headers, body and status code
-    koa.set('access-control-allow-origin', this.settings.allowOrigin)
+    const origin = this.resolveOrigin(koa)
+
+    if (origin) {
+      koa.set('access-control-allow-origin', origin)
+      koa.set('vary', 'Origin')
+    }
+
     koa.set('x-api-version', this.settings.version)
     koa.set('access-control-expose-headers', this.settings.responseHeaders.join(','))
 

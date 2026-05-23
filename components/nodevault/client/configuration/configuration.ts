@@ -6,6 +6,7 @@ export interface ClientConfiguration {
   platform: {
     api: string
     apiProxy: string
+    apiProxyNc: string
     app: string
     assets: string
   }
@@ -19,6 +20,10 @@ export const clientConfiguration: any = {
   local: 'env$NODE_ENV$development', // will be true if the NODE_ENV env var equals development, otherwise false
   platform: {
     assets: 'https://assets.nodevault.cloud',
+    apiProxyNc: {
+      default: 'http://api.nodevault.local:9002',
+      prod: 'https://www.nickchampion.me/api',
+    },
     apiProxy: {
       default: 'http://api.nodevault.local:9002',
       prod: 'https://www.nodevault.cloud/api',

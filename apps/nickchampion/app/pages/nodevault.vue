@@ -27,7 +27,7 @@
           </p>
 
           <p class="text-lg text-slate-500 leading-relaxed max-w-2xl mb-8">
-            A privacy information portal I designed and built. NodeVault covers three practical paths
+            A personal project I'm actively developing, NodeVault covers three practical paths
             to reducing your digital footprint: de-Googling your phone with GrapheneOS, replacing cloud
             subscriptions with a self-hosted UmbrelOS home server and protecting your home network from IoT surveillance.
           </p>

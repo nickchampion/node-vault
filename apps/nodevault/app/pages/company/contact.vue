@@ -115,15 +115,12 @@
 </template>
 
 <script setup lang="ts">
-import type { ContactRequestSchema } from '@nodevault/platform.components.nodevault.openapi'
 import { validateContactForm } from '../../utils/validation'
 
 useSeoMeta({
   title: 'Get in Touch | NodeVault',
   description: 'Have a question about GrapheneOS, self-hosting with UmbrelOS, or setting up a privacy router? Get in touch for honest guidance — no sales pitch, no obligation.',
 })
-
-const config = useConfig()
 
 const interestOptions = [
   { label: 'GrapheneOS / Privacy Phone', value: 'grapheneos' },
@@ -132,14 +129,15 @@ const interestOptions = [
   { label: 'Not sure — general question', value: 'other' },
 ]
 
-const defaultState = (): ContactRequestSchema => ({
+const defaultState = () => ({
   name: '',
   email: '',
-  phone: undefined,
-  interests: [],
+  phone: undefined as string | undefined,
+  interests: [] as string[],
   message: '',
 })
 
+const api = useApiClient()
 const state = reactive(defaultState())
 const pending = ref(false)
 const submitted = ref(false)
@@ -149,18 +147,15 @@ const submit = async () => {
   pending.value = true
   error.value = null
 
-  try {
-    await $fetch(`${config.platform.api}/comms/contact`, {
-      method: 'POST',
-      body: state,
-    })
+  const response = await api.comms.contact(state)
 
+  if (response.success) {
     submitted.value = true
-  } catch {
-    error.value = 'Failed to send your message. Please try again.'
-  } finally {
-    pending.value = false
+  } else {
+    error.value = response.error?.message ?? 'Failed to send your message. Please try again.'
   }
+
+  pending.value = false
 }
 
 const reset = () => {

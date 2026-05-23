@@ -118,15 +118,13 @@
 </template>
 
 <script setup lang="ts">
-import { validateContactForm } from '../utils/validation/contact'
 import type { ContactRequestSchema } from '@nodevault/platform.components.nodevault.openapi'
+import { validateContactForm } from '../utils/validation/contact'
 
 useSeoMeta({
   title: 'Contact — Nick Champion',
   description: 'Get in touch with Nick Champion.',
 })
-
-const config = useConfig()
 
 type FormState = Omit<ContactRequestSchema, 'interests'>
 
@@ -137,6 +135,7 @@ const defaultState = (): FormState => ({
   message: '',
 })
 
+const api = useApiClient()
 const state = reactive(defaultState())
 const pending = ref(false)
 const submitted = ref(false)
@@ -146,18 +145,15 @@ const submit = async () => {
   pending.value = true
   error.value = null
 
-  try {
-    await $fetch(`${config.platform.api}/comms/contact`, {
-      method: 'POST',
-      body: { ...state, interests: ['other'] } satisfies ContactRequestSchema,
-    })
+  const response = await api.comms.contact({ ...state, interests: ['other'] })
 
+  if (response.success) {
     submitted.value = true
-  } catch {
-    error.value = 'Failed to send your message. Please try again.'
-  } finally {
-    pending.value = false
+  } else {
+    error.value = response.error?.message ?? 'Failed to send your message. Please try again.'
   }
+
+  pending.value = false
 }
 
 const reset = () => {

@@ -24,7 +24,7 @@ const start = async () => {
       indexes: indexes,
       document: composeOpenApiDocument,
     },
-    serverConfiguration.api,
+    serverConfiguration.origins,
     serverConfiguration.version,
     String(serverConfiguration.environment),
   )

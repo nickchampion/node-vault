@@ -1,6 +1,6 @@
 import type { ApiOptions, ApiResponse } from '@nodevault/platform.components.nodevault.client'
 import type { UserSchema, VerifyLoginSchema } from '@nodevault/platform.components.nodevault.openapi'
-import { isFutureDate, toUtcIso } from '@nodevault/platform.components.utils'
+import { isCloudflareWorker, isFutureDate, toUtcIso } from '@nodevault/platform.components.utils'
 
 export const useAuthStore = defineStore('auth', () => {
   const device = useDevice()
@@ -16,13 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
   const userCookie = useCookie<UserSchema | null>('nodevault-user', cookieOptions)
 
   const user = ref<UserSchema | null>(userCookie.value ?? null)
-
-  const isCloudflareWorker = () => {
-    return typeof globalThis !== 'undefined'
-      && typeof globalThis.fetch === 'function'
-      && globalThis.document === undefined
-      && globalThis.WorkerGlobalScope !== undefined
-  }
 
   const cookies = [
     { ref: auth, key: 'nodevault-auth' },

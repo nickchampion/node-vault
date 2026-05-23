@@ -5,6 +5,7 @@ export type ServerConfiguration = {
   dev: boolean
   api: string
   app: string
+  origins: string[]
   environment: EnvironmentSettings
   version: string
   ravendb: RavenDB
@@ -45,6 +46,10 @@ export const server = {
   dev: {
     default: true,
     prod: false,
+  },
+  origins: {
+    default: ['http://www.nodevault.local:9001', 'http://www.nickchampion.local:9003'],
+    prod: ['https://www.nodevault.cloud', 'https://www.nickchampion.me'],
   },
   production: {
     default: false,
