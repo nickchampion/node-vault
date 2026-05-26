@@ -7,7 +7,7 @@
       <UContainer class="relative">
         <div class="max-w-3xl">
           <p class="text-sky-600 font-semibold text-sm tracking-wide uppercase mb-4">
-            Engineering Leadership
+            Senior / Lead Engineer
           </p>
 
           <h1 class="text-5xl sm:text-6xl font-bold text-slate-900 tracking-tight leading-tight mb-6">
@@ -15,7 +15,7 @@
           </h1>
 
           <p class="text-xl sm:text-2xl text-slate-600 font-medium mb-4">
-            VP of Engineering · 20+ Years Building Software
+            20+ Years Building Software
           </p>
 
           <p class="text-lg text-slate-500 leading-relaxed max-w-2xl mb-10">
