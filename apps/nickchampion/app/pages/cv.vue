@@ -13,7 +13,7 @@
           </h1>
 
           <p class="text-xl text-slate-600 font-medium mb-6">
-            VP of Engineering · 20+ Years in Software Engineering
+            Senior / Lean Engineer · 20+ Years in Software Engineering
           </p>
 
           <div class="flex flex-wrap gap-4 text-sm text-slate-500">
@@ -147,7 +147,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'CV — Nick Champion',
-  description: 'CV of Nick Champion — VP of Engineering with 20+ years building, scaling and leading software delivery teams.',
+  description: 'CV of Nick Champion — Senior / Lean Engineer with 20+ years building, scaling and leading software delivery teams.',
 })
 
 const keyStrengths = [

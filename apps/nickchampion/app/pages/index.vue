@@ -264,7 +264,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Nick Champion — Engineering Leadership',
-  description: 'Hands-on engineer and VP of Engineering with 25 years\' experience building, scaling and leading software delivery teams.',
+  description: 'Hands-on seniot / lead engineer with 20+ years\' experience building, scaling and leading software delivery teams.',
 })
 
 const strengths = [
