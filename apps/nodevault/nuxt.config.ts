@@ -155,4 +155,15 @@ export default defineNuxtConfig(<NuxtConfig>{
   pinia: {
     storesDirs: ['./stores/**'],
   },
+
+  // Cloudflare Workers has no filesystem access, so the default server-side
+  // icon handler 404s in production. Scan all components at build time and
+  // bundle every icon that's actually used into the client — no runtime fetch.
+  icon: {
+    serverBundle: false,
+    clientBundle: {
+      scan: true,
+      sizeLimitKb: 0,
+    },
+  },
 })
