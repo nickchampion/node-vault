@@ -51,6 +51,6 @@ const navLinks: NavigationMenuItem[] = [
     ],
   },
   // { label: 'Our services', to: '/services' },
-  { label: 'Blog', to: '/blog' },
+  { label: 'Blog', to: '/blog/structuring-your-grapheneos-install' },
 ]
 </script>
